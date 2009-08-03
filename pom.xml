@@ -1,0 +1,161 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.micromata.jak</groupId>
+	<artifactId>XJCPluginJavaApiforKml</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<name>XJCPluginJavaApiforKml</name>
+	<description>Generates a Java-API for the KML-fileformat defined by the OGC.</description>
+	<packaging>jar</packaging>
+	<url>http://code.google.com/p/xjcpluginjavaapiforkml/</url>
+	<organization>
+		<name>Micromata GmbH</name>
+		<url>http://micromata.de</url>
+	</organization>
+	<scm>
+		<connection>scm:svn::http://xjcpluginjavaapiforkml.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://xjcpluginjavaapiforkml.googlecode.com/svn/trunk/</developerConnection>
+	</scm>
+	<developers>
+		<developer>
+			<id>bachmann.florian</id>
+			<name>Florian Bachmann</name>
+			<email>f.bachmann@micromata.de</email>
+			<organization>Micromata GmbH</organization>
+			<organizationUrl>http://www.micromata.com</organizationUrl>
+			<timezone>-1</timezone>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>schnitzelhugo</id>
+			<name>Bernd Kratz</name>
+			<email>b.kratz@micromata.de</email>
+			<organization>Micromata GmbH</organization>
+			<organizationUrl>http://www.micromata.com</organizationUrl>
+			<timezone>-1</timezone>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>landgraf1967</id>
+			<name>Thomas Landgraf</name>
+			<email>tl@micromata.de</email>
+			<organization>Micromata GmbH</organization>
+			<organizationUrl>http://www.micromata.com</organizationUrl>
+			<timezone>-1</timezone>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+	<licenses>
+		<license>
+			<name>BSD license</name>
+			<url>/LICENSE.txt</url>
+			<comments>All rights reserved.</comments>
+			<distribution>manual</distribution>
+		</license>
+	</licenses>
+	<dependencies>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-xjc</artifactId>
+			<version>2.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.5</version>
+		</dependency>
+		<dependency>
+			<groupId>net.htmlparser.jericho</groupId>
+			<artifactId>jericho-html</artifactId>
+			<version>3.0</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>1.5</source>
+						<target>1.5</target>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<testFailureIgnore>true</testFailureIgnore>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	<repositories>
+		<repository>
+			<id>java.net-maven2-repository</id>
+			<url>java-net:/maven2-repository/trunk/repository/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Maven 2 Repository</name>
+			<url>http://download.java.net/maven/2</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>maven-repository.dev.java.net</id>
+			<name>Java.net Maven 1 Repository (legacy)</name>
+			<url>http://download.java.net/maven/1</url>
+			<layout>legacy</layout>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Maven 2 Repository</name>
+			<url>http://download.java.net/maven/2</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>maven-repository.dev.java.net</id>
+			<name>Java.net Maven 1 Repository (legacy)</name>
+			<url>http://download.java.net/maven/1</url>
+			<layout>legacy</layout>
+		</pluginRepository>
+	</pluginRepositories>
+</project>
