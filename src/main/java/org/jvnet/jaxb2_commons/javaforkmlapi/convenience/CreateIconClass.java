@@ -15,6 +15,8 @@
 // ///////////////////////////////////////////////////////////////////////////
 package org.jvnet.jaxb2_commons.javaforkmlapi.convenience;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.XJCJavaForKmlApiPlugin;
@@ -22,9 +24,17 @@ import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
 import org.xml.sax.ErrorHandler;
 
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpression;
+import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JMethod;
+import com.sun.codemodel.JType;
+import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
+import com.sun.tools.xjc.generator.bean.field.SingleField;
+import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
+import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 public class CreateIconClass extends Command {
@@ -43,19 +53,42 @@ public class CreateIconClass extends Command {
 
 	@Override
 	public void execute() {
+		JDefinedClass elementType = null;
 		for (final ClassOutline classOutline : outline.getClasses()) {
 			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
-
-			if (cc.implRef.name().equals("Icon") && cc.implClass._extends().name().equals("Link")) {
-				System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + "link class found.");
-				JDefinedClass iconClass = cc.implClass;
-
-				iconClass.methods().clear();
-				// Iterator constructors = iconClass.constructors();
-				// final JMethod stringArgConstructor = iconClass.constructor(JMod.PUBLIC);
-
+			if (cc.implRef.name().equals("Icon") && cc.implClass._extends().name().equals("BasicLink")) {
+				System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + " link class found.");
+				elementType = cc.implClass;
 			}
 		}
+
+		for (final ClassOutline classOutline : outline.getClasses()) {
+			
+			for (final JFieldVar jFieldVar : classOutline.implClass.fields().values()) {
+				if (jFieldVar.name().equals("icon") && shouldItBeAnIcon(jFieldVar.type())) {
+					System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + " usage of link class found." + classOutline.implClass.fullName());
+					jFieldVar.type(elementType);
+				}
+
+			}
+			
+			for (final JMethod jmethod : classOutline.implClass.methods()) {
+				if (jmethod.name().endsWith("Icon") && shouldItBeAnIcon(jmethod.type())) {
+					jmethod.type(elementType);
+				}
+
+				for (JVar jParams : jmethod.listParams()) {
+					if (jmethod.name().endsWith("Icon") && shouldItBeAnIcon(jParams.type())) {
+						jParams.type(elementType);
+					}
+				}
+			}
+		}
+
 	}
+
+	private boolean shouldItBeAnIcon(final JType jType) {
+	  return jType.fullName().equals("de.micromata.opengis.kml.v_2_2_0.Link") || jType.fullName().equals("de.micromata.opengis.kml.v_2_2_0.BasicLink");
+  }
 
 }

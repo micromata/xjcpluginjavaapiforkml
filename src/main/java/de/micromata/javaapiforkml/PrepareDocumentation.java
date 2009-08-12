@@ -21,7 +21,7 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.addproperjavadoc.JaxbJavaDoc;
 import org.jvnet.jaxb2_commons.javaforkmlapi.addproperjavadoc.JaxbJavaDocElements;
-import org.jvnet.jaxb2_commons.javaforkmlapi.addproperjavadoc.XjcAddProperJavaDocumentationForKML;
+import org.jvnet.jaxb2_commons.javaforkmlapi.addproperjavadoc.AddProperJavaDocumentationForKML;
 
 
 
@@ -617,12 +617,13 @@ public class PrepareDocumentation {
 				cleanTitle = cleanTitle.substring(cleanTitle.indexOf("<"), cleanTitle.indexOf(" ")) + ">";
 			}
 
-			// <gx:flyto> --> <flyto> && <atom:author> --> <author>
+			 //<gx:flyto> --> <flyto> && <atom:author> --> <author>
 			if (cleanTitle.contains(":")) {
 				cleanTitle = "<" + cleanTitle.substring(cleanTitle.lastIndexOf(":") + 1, cleanTitle.length());
 			}
 
 			cleanTitle = cleanTitle.substring(cleanTitle.indexOf("<") + 1, cleanTitle.indexOf(">"));
+			
 		}
 
 		return cleanTitle;
@@ -673,8 +674,8 @@ public class PrepareDocumentation {
 	public static void main(String[] args) throws Exception {
 		BasicConfigurator.configure();
 		try {
-			PrepareDocumentation.buildDocumentationFromFoundElements("file:src/main/resources/data/kmlreference22_ext_firefox.html",
-					XjcAddProperJavaDocumentationForKML.LOADJAVADOCSFROMFILE);
+			PrepareDocumentation.buildDocumentationFromFoundElements("file:src/main/resources/data/090812_kmlreference22_ext_firefox.html",
+					AddProperJavaDocumentationForKML.LOADJAVADOCSFROMFILE);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

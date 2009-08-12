@@ -31,10 +31,11 @@ public class CreateCreateAndAddMethodsForCoordinates extends Command {
 
 	private JDefinedClass annotateCoordinates;
 
+
 	public CreateCreateAndAddMethodsForCoordinates(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 		codeModel = outline.getCodeModel();
-		annotateCoordinates   = pool.getClassCoordinate();
+		annotateCoordinates = pool.getClassCoordinate();
 	}
 
 	@Override
@@ -50,6 +51,7 @@ public class CreateCreateAndAddMethodsForCoordinates extends Command {
 			}
 		}
 	}
+
 	@SuppressWarnings("unchecked")
 	protected Class interfaceClass = java.util.List.class;
 
@@ -58,9 +60,7 @@ public class CreateCreateAndAddMethodsForCoordinates extends Command {
 
 	private void generateCreateAndSetCoordinatesMethod(Outline outline, ClassOutlineImpl cc, final JDefinedClass implClass, JFieldVar fieldVar) {
 
-		
 		StringBuffer debugOut = new StringBuffer();
-
 
 		JClass jaxbElementClass = null;
 		if (annotateCoordinates != null) {
@@ -95,7 +95,6 @@ public class CreateCreateAndAddMethodsForCoordinates extends Command {
 		LOG.info(debugOut.toString());
 	}
 
-	
 	private void generateGetClassMethod(ClassOutlineImpl cc) {
 		if (cc.target.isAbstract()) {
 			return;

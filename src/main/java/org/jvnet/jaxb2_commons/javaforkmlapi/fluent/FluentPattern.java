@@ -63,6 +63,10 @@ public class FluentPattern extends Command {
 
 	private JDefinedClass classCoordinates = null;
 
+	private JDefinedClass classIcon;
+
+	private JDefinedClass classLink;
+
 	public FluentPattern(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 		annotateObvicious = pool.getClassObviousAnnotation();
@@ -74,6 +78,9 @@ public class FluentPattern extends Command {
 		codeModel = outline.getCodeModel();
 		subclasses = Util.findSubClasses(outline);
 
+		classIcon = pool.getClassIcon();
+		classLink = pool.getClassLink();
+
 	}
 
 	@Override
@@ -84,9 +91,26 @@ public class FluentPattern extends Command {
 			final JDefinedClass implClass = classOutline.implClass;
 
 			for (FieldOutline fieldOutline : classOutline.getDeclaredFields()) {
-				final JType type = TypeUtil.getCommonBaseType(codeModel, Util.listPossibleTypes(cc, fieldOutline.getPropertyInfo()));
+				JType type = TypeUtil.getCommonBaseType(codeModel, Util.listPossibleTypes(cc, fieldOutline.getPropertyInfo()));
+				if (((type.name().equals("BasicLink") || (type.name().equals("Link")) && Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)).equals("Icon")))) {
+					/*
+					 * special case for Icon. IconStyle uses protected BasicLink icon.
+					 *  subclasses.get(currentFieldName) will return, that 
+					 *  possible subclasses for BasicLink are Icon and Link,
+					 *  hence createAndSetLink and createAndSetIcon methods
+					 *  are created. This isn't desired as IconStyle should
+					 *  define protected Icon icon.
+					 *  
+					 *  If it is possible to change the type of a variable
+					 *  at the CClassInfo-Level, this if block would be
+					 *  obsolete.
+					 */
+					type = classIcon.unboxify();
+					
+				}
+				
 				String currentFieldName = Util.eliminateTypeSuffix(type.name());
-				// if (fieldOutline.getPropertyInfo().getName(false).equals("coordinates")) {
+			// if (fieldOutline.getPropertyInfo().getName(false).equals("coordinates")) {
 				// LOG.info("+1 "+ cc.implRef.name() + " " + currentFieldName + " " + fieldOutline.getPropertyInfo().getName(false));
 				// }
 				if (currentFieldName.equals("AbstractObject")) {
@@ -106,8 +130,22 @@ public class FluentPattern extends Command {
 
 				ArrayList<CClassInfo> subclasseslist = subclasses.get(currentFieldName);
 				// LOG.info("+  " + currentFieldName + " " + fieldOutline.getPropertyInfo().getName(false));
-				if (subclasseslist.size() > 0 && !(type.name().equals("Icon") || type.name().equals("Link") || currentFieldName.equals("Icon") || currentFieldName.equals("Link"))) {
+				
+//				if (cc.implClass.name().equals("Overlay")) {
+//				System.out.println("<<>><<>><<>>fn "+ cc.implClass.fullName());
+//				System.out.println("<<>><<>><<>>nn "+ type.name());
+//				System.out.println("<<>><<>><<>>fn "+ type.unboxify().fullName());
+//				System.out.println("<<>><<>><<>>nn "+ type.unboxify().name());
+//				System.out.println("<<>><<>><<>>nn "+ fieldOutline.getPropertyInfo().getName(false));
+//				}
+				
+//				if (type.unboxify().name().equals("Link") && fieldOutline.getPropertyInfo().getName(false).equals("icon")) {
+//					type = classIcon.unboxify();
+//				}
+//				if (subclasseslist.size() > 0 && !(type.name().equals("Icon") || type.name().equals("Link") || currentFieldName.equals("Icon") || currentFieldName.equals("Link"))) {
+				if (subclasseslist.size() > 0) { // && !(type.name().equals("Icon") || type.name().equals("Link") || currentFieldName.equals("Icon") || currentFieldName.equals("Link"))) {
 					for (CClassInfo cClassInfo : subclasseslist) {
+						System.out.println("1<<>><<>><<>>fn 1:"+ cc.implClass.name() + " 2:" + cClassInfo.toType(outline, Aspect.EXPOSED).name() + " 3:" + cClassInfo.shortName + " 4:"+type.name() );
 						generateCreateAndSetOrAddMethod(outline, cc, implClass, fieldOutline, cClassInfo.toType(outline, Aspect.EXPOSED),
 						    cClassInfo.shortName);
 					}
@@ -115,8 +153,9 @@ public class FluentPattern extends Command {
 				}
 
 				// use variable-name everywhere instead of variable-type-name (because of Vec2-name conflict)
-				generateCreateAndSetOrAddMethod(outline, cc, implClass, fieldOutline, type, Util.upperFirst(fieldOutline.getPropertyInfo().getName(
-				    false)));
+				System.out.println("2<<>><<>><<>>fn 1:"+ cc.implClass.name() + " 2:" + type.name() + " 3:" + Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)) + " 4:"+type.name());
+				generateCreateAndSetOrAddMethod(outline, cc, implClass, fieldOutline, type, Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)));
+				
 			}
 
 			generateSetAndAddToCollection(cc);
@@ -432,7 +471,7 @@ public class FluentPattern extends Command {
 		}
 		debugOut.append(") created.");
 
-		LOG.info(debugOut.toString());
+		// LOG.info(debugOut.toString());
 	}
 
 }

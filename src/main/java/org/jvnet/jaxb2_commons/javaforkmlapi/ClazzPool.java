@@ -20,6 +20,8 @@ public class ClazzPool {
 	private JDefinedClass classObviousAnnotation;
 	private JDefinedClass classCoordinateConverter;
 	private JDefinedClass classCoordinate;
+	private JDefinedClass classIcon;
+	private JDefinedClass classLink;
 
 	public ClazzPool(Outline outline) {
 	  JPackage kmlpackage = Util.getKmlClassPackage(outline);
@@ -35,14 +37,26 @@ public class ClazzPool {
 			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 
 			if (cc.implRef.name().equals("Coordinate")) {
-				System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + "coordinate class found.");
+				System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + " Coordinate class found.");
 				classCoordinate = cc.implClass;
-
 				classCoordinate.methods().clear();
 				// Iterator constructors = iconClass.constructors();
 				// final JMethod stringArgConstructor = iconClass.constructor(JMod.PUBLIC);
-
+				continue;
 			}
+			
+			if (cc.implRef.name().equals("Icon")) {
+				System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + " Icon class found.");
+				classIcon = cc.implClass;
+				continue;
+			}
+			
+			if (cc.implRef.name().equals("Link")) {
+				System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + " Link class found.");
+				classLink = cc.implClass;
+				continue;
+			}
+			
 		}
 		
 		
@@ -59,6 +73,17 @@ public class ClazzPool {
 
 	public JDefinedClass getClassCoordinate() {
   	return classCoordinate;
+  }
+
+
+	public JDefinedClass getClassIcon() {
+	  return classIcon;
+  }
+
+	
+
+	public JDefinedClass getClassLink() {
+	  return classLink;
   }
 
 }

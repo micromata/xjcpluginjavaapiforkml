@@ -32,6 +32,7 @@ import com.sun.tools.xjc.outline.EnumConstantOutline;
 import com.sun.tools.xjc.outline.EnumOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
+import com.sun.xml.xsom.XSAnnotation;
 import com.sun.xml.xsom.XSElementDecl;
 import com.sun.xml.xsom.XSParticle;
 import com.sun.xml.xsom.XSTerm;
@@ -121,7 +122,6 @@ public class DefaultValuePlugin extends Command {
 					continue;
 				}
 				String defaultValue = element.getDefaultValue().value;
-
 				// Get handle to JModel representing the field
 				Map<String, JFieldVar> fields = co.implClass.fields();
 				JFieldVar var = fields.get(fieldInfo.getName(false));
