@@ -145,7 +145,7 @@ public class FluentPattern extends Command {
 //				if (subclasseslist.size() > 0 && !(type.name().equals("Icon") || type.name().equals("Link") || currentFieldName.equals("Icon") || currentFieldName.equals("Link"))) {
 				if (subclasseslist.size() > 0) { // && !(type.name().equals("Icon") || type.name().equals("Link") || currentFieldName.equals("Icon") || currentFieldName.equals("Link"))) {
 					for (CClassInfo cClassInfo : subclasseslist) {
-						System.out.println("1<<>><<>><<>>fn 1:"+ cc.implClass.name() + " 2:" + cClassInfo.toType(outline, Aspect.EXPOSED).name() + " 3:" + cClassInfo.shortName + " 4:"+type.name() );
+//						System.out.println("1<<>><<>><<>>fn 1:"+ cc.implClass.name() + " 2:" + cClassInfo.toType(outline, Aspect.EXPOSED).name() + " 3:" + cClassInfo.shortName + " 4:"+type.name() );
 						generateCreateAndSetOrAddMethod(outline, cc, implClass, fieldOutline, cClassInfo.toType(outline, Aspect.EXPOSED),
 						    cClassInfo.shortName);
 					}
@@ -153,7 +153,7 @@ public class FluentPattern extends Command {
 				}
 
 				// use variable-name everywhere instead of variable-type-name (because of Vec2-name conflict)
-				System.out.println("2<<>><<>><<>>fn 1:"+ cc.implClass.name() + " 2:" + type.name() + " 3:" + Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)) + " 4:"+type.name());
+//				System.out.println("2<<>><<>><<>>fn 1:"+ cc.implClass.name() + " 2:" + type.name() + " 3:" + Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)) + " 4:"+type.name());
 				generateCreateAndSetOrAddMethod(outline, cc, implClass, fieldOutline, type, Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)));
 				
 			}
@@ -362,6 +362,7 @@ public class FluentPattern extends Command {
 		} else {
 			generateWith.javadoc().add("fluent setter");
 			generateWith.javadoc().addParam(value).append("required parameter");
+			generateWith.javadoc().add("\n@see #set"+Util.upperFirst(field.name())+"("+value.type().name()+")");
 			generateWith.body().directStatement("this.set" + Util.upperFirst(field.name()) + "(" + field.name() + ");");
 		}
 		// generateSet.body().directStatement("this."+field.name() + " = " + field.name()+";");
@@ -471,7 +472,7 @@ public class FluentPattern extends Command {
 		}
 		debugOut.append(") created.");
 
-		// LOG.info(debugOut.toString());
+		LOG.info(debugOut.toString());
 	}
 
 }

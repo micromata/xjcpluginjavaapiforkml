@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.zip.ZipOutputStream;
 
 import javax.xml.XMLConstants;
@@ -35,6 +36,7 @@ import com.sun.codemodel.JClassContainer;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JDocComment;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
@@ -216,8 +218,13 @@ public class CreateMarshalAndUnmarshal extends Command {
 	 * @param cc
 	 */
 	private void generateMarshalMethods(ClassOutlineImpl cc) {
-		final JMethod generateMarshalOutputStream = generateMarshal(cc, outputStreamClass);
-		
+		ArrayList<String> comment = new ArrayList<String>();
+		comment.add("Java to KML\n");
+		comment.add("The object graph is marshalled to an OutputStream object.\n");
+		comment.add("The object is not saved as a zipped .kmz file (boolean is false).\n");
+		comment.add("@see marshal(final File, final boolean)");
+		final JMethod generateMarshalOutputStream = generateMarshal(cc, outputStreamClass, comment);
+		comment.clear();
 //		public boolean marshal(final Writer writer) {
 //			try {
 //				m = this.createMarshaller();
@@ -230,9 +237,12 @@ public class CreateMarshalAndUnmarshal extends Command {
 //				return false;
 //			}
 //		}
-		final JMethod generateMarshalWriter = generateMarshal(cc, writerClass);
-		
-		
+		comment.add("Java to KML\n");
+		comment.add("The object graph is marshalled to a Writer object.\n");
+		comment.add("The object is not saved as a zipped .kmz file (boolean is false).\n");
+		comment.add("@see marshal(final File, final boolean)");
+		final JMethod generateMarshalWriter = generateMarshal(cc, writerClass, comment);
+		comment.clear();
 		
 		//		public boolean marshal(final File filename, boolean zipped) throws FileNotFoundException {
 		//			OutputStream out = new FileOutputStream(filename);
@@ -242,24 +252,44 @@ public class CreateMarshalAndUnmarshal extends Command {
 		//
 		//			return this.marshall(out);
 		//		}
+		comment.add("Java to KML\n");
+		comment.add("The object graph is marshalled to a File object.\n");
+		comment.add("The boolean value indicates whether the File object is saved as a zipped .kmz file or not.");
+		comment.add("\n<b>Warning:</b>\n");
+		comment.add("<b>THE KMZ FEATURE, ISN'T WORKING YET!</b>\n");
+		final JMethod generateMarshallFilenameWithZIP = cc.implClass.method(JMod.PUBLIC, cc.implClass.owner().BOOLEAN, "marshal");
+		generateMarshallFilenameWithZIP._throws(FileNotFoundException.class);
+		generateMarshallFilenameWithZIP.javadoc().append(comment);
+		
+		final JVar filenameVar = generateMarshallFilenameWithZIP.param(JMod.FINAL, File.class, "filename");
+		final JVar zippedVar = generateMarshallFilenameWithZIP.param(JMod.FINAL, boolean.class, "zipped");
+		JVar outVar = generateMarshallFilenameWithZIP.body().decl(outputStreamClass, "out",JExpr._new(fileOutputStreamClass).arg(filenameVar));
+		final JConditional ifBlockFilename = generateMarshallFilenameWithZIP.body()._if(zippedVar.eq(JExpr.TRUE));
+		ifBlockFilename._then().assign(outVar, JExpr._new(zipOutputStreamClass).arg(outVar));
+		generateMarshallFilenameWithZIP.body()._return(JExpr._this().invoke(generateMarshalOutputStream).arg(outVar));
+		comment.clear();
+		
+		
+		
+		comment.add("Java to KML\n");
+		comment.add("The object graph is marshalled to a File object.\n");
+		comment.add("The object is not saved as a zipped .kmz file (boolean is false).\n");
+		comment.add("@see marshal(final File, final boolean)");
 		final JMethod generateMarshallFilename = cc.implClass.method(JMod.PUBLIC, cc.implClass.owner().BOOLEAN, "marshal");
 		generateMarshallFilename._throws(FileNotFoundException.class);
-		generateMarshallFilename.javadoc().append("Java to KML");
-		final JVar filenameVar = generateMarshallFilename.param(JMod.FINAL, File.class, "filename");
-		final JVar zippedVar = generateMarshallFilename.param(JMod.FINAL, boolean.class, "zipped");
-		JVar outVar = generateMarshallFilename.body().decl(outputStreamClass, "out",JExpr._new(fileOutputStreamClass).arg(filenameVar));
-		final JConditional ifBlockFilename = generateMarshallFilename.body()._if(zippedVar.eq(JExpr.TRUE));
-		ifBlockFilename._then().assign(outVar, JExpr._new(zipOutputStreamClass).arg(outVar));
-		generateMarshallFilename.body()._return(JExpr._this().invoke(generateMarshalOutputStream).arg(outVar));
+		generateMarshallFilename.javadoc().append(comment);
+		JVar filename = generateMarshallFilename.param(JMod.FINAL, File.class, "filename");
+		
+		generateMarshallFilename.body()._return(JExpr._this().invoke(generateMarshallFilenameWithZIP).arg(filename).arg(JExpr.FALSE));
 	}
 
-	private JMethod generateMarshal(ClassOutlineImpl cc, JType argumentType) {
+	private JMethod generateMarshal(ClassOutlineImpl cc, JType argumentType, ArrayList<String> comment) {
 	  // public boolean marshall(final String filename) throws FileNotFoundException {
 		final JMethod generateMarshalOutputStream = cc.implClass.method(JMod.PUBLIC, cc.implClass.owner().BOOLEAN, "marshal");
 		if (argumentType.equals(outputStreamClass)) {
 		generateMarshalOutputStream._throws(FileNotFoundException.class);
 		}
-		generateMarshalOutputStream.javadoc().append("Java to KML");
+		generateMarshalOutputStream.javadoc().append(comment);
 		final JVar value = generateMarshalOutputStream.param(JMod.FINAL, argumentType, argumentType.name().toLowerCase());
 
 		// try {
@@ -336,7 +366,11 @@ public class CreateMarshalAndUnmarshal extends Command {
 		//			return null;
 		//		}			
 		final JMethod generateUnMarshallerFileFile = cc.implClass.method(JMod.PUBLIC| JMod.STATIC, kmlClass, "unmarshal");
-		generateUnMarshallerFileFile.javadoc().append("KML to Java");
+		generateUnMarshallerFileFile.javadoc().add("KML to Java\n");
+		generateUnMarshallerFileFile.javadoc().add("KML given as a file object is transformed into a graph of Java objects.\n");
+		generateUnMarshallerFileFile.javadoc().add("The boolean value indicates, whether the File object should be validated \n");
+		generateUnMarshallerFileFile.javadoc().add("automatically during unmarshalling and be checked if the object graph meets \n");
+		generateUnMarshallerFileFile.javadoc().add("all constraints defined in OGC's KML schema specification.");
 		final JVar fileunmarshallVar = generateUnMarshallerFileFile.param(JMod.FINAL, fileClass, "file");
 		final JVar validateVar = generateUnMarshallerFileFile.param(JMod.FINAL, boolean.class, "validate");
 		
@@ -378,7 +412,11 @@ public class CreateMarshalAndUnmarshal extends Command {
 		//		}
 		final JMethod generateUnMarshallerFile = cc.implClass.method(JMod.PUBLIC| JMod.STATIC, kmlClass, "unmarshal");
 		generateUnMarshallerFile.param(JMod.FINAL, fileClass, "file");
-		generateUnMarshallerFile.javadoc().append("KML to Java");
+		generateUnMarshallerFile.javadoc().add("KML to Java\n");
+		generateUnMarshallerFile.javadoc().add("KML given as a file object is transformed into a graph of Java objects.\n");
+		generateUnMarshallerFile.javadoc().add("Similar to the method: \n");
+		generateUnMarshallerFile.javadoc().add("unmarshal(final File, final boolean) \n");
+		generateUnMarshallerFile.javadoc().add("but with the exception that the File object is not validated (boolean is false). \n");
 		generateUnMarshallerFile.body()._return(kmlClass.boxify().staticInvoke(generateUnMarshallerFileFile).arg(fileunmarshallVar).arg(JExpr.FALSE));
 
 
@@ -397,7 +435,9 @@ public class CreateMarshalAndUnmarshal extends Command {
 		//		}
 		final JMethod generateUnMarshallerFromString = cc.implClass.method(JMod.PUBLIC | JMod.STATIC, kmlClass, "unmarshal");
 //		generateUnMarshallerFromString.annotate(SuppressWarnings.class).param("value", "unchecked");
-		generateUnMarshallerFromString.javadoc().append("KML to Java");
+		generateUnMarshallerFromString.javadoc().add("KML to Java\n");
+		generateUnMarshallerFromString.javadoc().add("Similar to the other unmarshal methods \n\n");
+		generateUnMarshallerFromString.javadoc().add("but with the exception that it transforms a String into a graph of Java objects. \n");
 		final JVar stringunmarshallVar = generateUnMarshallerFromString.param(JMod.FINAL, String.class, "content");
 		
 		// try {

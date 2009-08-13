@@ -158,23 +158,25 @@ public class AddProperJavaDocumentationForKML extends Command {
 					// skip equals and hashcode methods
 					continue;
 				}
-				//LOG.info("--!> " + classOutline.implClass.name() + " !>" + jmethod.name());
-				
-				String subSequence = jmethod.name().substring(3, jmethod.name().length());
-//				if (classOutline.implRef._package().name())
-//				
-//				ClassOutlineImpl classOutlineImpl = classList.get(subSequence);
-//				LOG.info("" + classList.keySet());
-//				if (classOutlineImpl != null) {
-//					LOG.info("i-!> " + classOutline.implClass.name() + " !> " + jmethod.name() + " ¡> "+ subSequence + " c:" + classOutlineImpl.implClass.name());
-//				} else {
-//					LOG.info("e-!> " + classOutline.implClass.name() + " !> " + jmethod.name() + " ¡> "+ subSequence);
-//					
-//				}
-				
-				jmethod.javadoc().clear();
-				// jmethod.javadoc().addDeprecated();
-				jmethod.javadoc().add("@see " + Util.lowerFirst(subSequence));
+				// LOG.info("--!> " + classOutline.implClass.name() + " !>" + jmethod.name());
+				if (jmethod.name().startsWith("get") || jmethod.name().startsWith("set")) {
+					String subSequence = jmethod.name().substring(3, jmethod.name().length());
+					// if (classOutline.implRef._package().name())
+					//				
+					// ClassOutlineImpl classOutlineImpl = classList.get(subSequence);
+					// LOG.info("" + classList.keySet());
+					// if (classOutlineImpl != null) {
+					// LOG.info("i-!> " + classOutline.implClass.name() + " !> " + jmethod.name() + " ¡> "+ subSequence + " c:" +
+					// classOutlineImpl.implClass.name());
+					// } else {
+					// LOG.info("e-!> " + classOutline.implClass.name() + " !> " + jmethod.name() + " ¡> "+ subSequence);
+					//					
+					// }
+
+					jmethod.javadoc().clear();
+					// jmethod.javadoc().addDeprecated();
+					jmethod.javadoc().add("@see " + Util.lowerFirst(subSequence));
+				}
 			}
 		}
 	}
