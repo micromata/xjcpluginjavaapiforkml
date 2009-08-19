@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.micromata.jak</groupId>
 	<artifactId>XJCPluginJavaApiforKml</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<name>XJCPluginJavaApiforKml</name>
 	<description>Generates a Java-API for the KML-fileformat defined by the OGC.</description>
 	<packaging>jar</packaging>
