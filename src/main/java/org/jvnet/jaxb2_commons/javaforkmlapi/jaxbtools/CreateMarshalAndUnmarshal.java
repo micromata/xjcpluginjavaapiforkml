@@ -560,7 +560,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 	</code></pre>
   */
 	private void generateUnmarshalFromKmzMethod(ClassOutlineImpl cc) {
-		final JMethod unmarshalFromKMZ = cc.implClass.method(JMod.PUBLIC | JMod.STATIC, kmlClass.array(), "unmarshalFromKMZ");
+		final JMethod unmarshalFromKMZ = cc.implClass.method(JMod.PUBLIC | JMod.STATIC, kmlClass.array(), "unmarshalFromKmz");
 		unmarshalFromKMZ.javadoc().add("KMZ to Java\n");
 		unmarshalFromKMZ.javadoc().add("Similar to the other unmarshal methods\n\n");
 		unmarshalFromKMZ.javadoc().add("with the exception that it transforms a KMZ-file into a graph of Java objects. \n");	
