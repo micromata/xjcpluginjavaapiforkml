@@ -368,8 +368,8 @@ public class FluentPattern extends Command {
 		// generateSet.body().directStatement("this."+field.name() + " = " + field.name()+";");
 		// generate the javadoc
 		generateWith.body()._return(JExpr._this());
-		// LOG.info("w> " + cc.implClass.name() + " >> public " + cc.implClass.name() + " with" + Util.upperFirst(field.name()) + "("
-		// +field.type().name() + ") created [Override: " + override + "].");
+		LOG.info("w> " + cc.implClass.name() + " >> public " + cc.implClass.name() + " with" + Util.upperFirst(field.name()) + "("
+		 +field.type().name() + ") created [Override: " + override + "].");
 	}
 
 	private void generateWithMethods(final ClassOutlineImpl cc) {

@@ -1,6 +1,7 @@
 package org.jvnet.jaxb2_commons.javaforkmlapi;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.activation.MimeType;
@@ -34,6 +35,8 @@ import com.sun.tools.xjc.model.CClassInfo;
 import com.sun.tools.xjc.model.CClassInfoParent;
 import com.sun.tools.xjc.model.CCustomizations;
 import com.sun.tools.xjc.model.CElementPropertyInfo;
+import com.sun.tools.xjc.model.CEnumConstant;
+import com.sun.tools.xjc.model.CEnumLeafInfo;
 import com.sun.tools.xjc.model.CPluginCustomization;
 import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.model.CTypeRef;
@@ -72,158 +75,118 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 
 	public final static String PLUGINNAME = "[XJCJavaForKmlApiPlugin]";
 
+	public final static String PACKAGE_KML = "de.micromata.opengis.kml.v_2_2_0";
+
+	public final static String PACKAGE_GX = PACKAGE_KML + ".gx";
+
+	public final static String PACKAGE_ATOM = PACKAGE_KML + ".atom";
+
+	public final static String PACKAGE_XAL = PACKAGE_KML + ".xal";
+
 	private List<Command> mCommand = new ArrayList<Command>();
 
 	@Override
 	public void postProcessModel(Model model, ErrorHandler errorHandler) {
 		JPackage mainPackage = null;
+		CClassInfo classLink = null;
+		CEnumLeafInfo altitudeModeKML = null;
+		CEnumLeafInfo altitudeModeGX = null;
+
 		for (CClassInfo classInfo : model.beans().values()) {
-			System.out.println(classInfo.fullName());
 			if (classInfo.shortName.equals("Kml")) {
+				LOG.info("Found KML package: " + classInfo.getOwnerPackage().name());
 				mainPackage = classInfo.getOwnerPackage();
 				break;
 			}
 		}
-		assert mainPackage != null;
 
-		CClassInfo classLink = null;
 		for (CClassInfo classInfo : model.beans().values()) {
 			if (classInfo.shortName.equals("Link") && classInfo.getOwnerPackage().name().equals(mainPackage.name())) {
 				classLink = classInfo;
-				System.out.println("Found Link class, prepare creation of Icon class");
+//				for (iterable_type iterable_element : classLink.getProperties()) {
+//	        
+//        }
+				Util.logInfo("Found Link class, prepare creation of Icon class");
 				break;
 			}
 		}
-
-		// final CPropertyInfo propertyInfo = new CElementPropertyInfo(
-		// "Peter",
-		// CollectionMode.NOT_REPEATED,
-		// ID.NONE,
-		// null,
-		//						
-		// null, new CCustomizations(), null, "attribute",
-		// propertyTypeInfo, false);
-
+		
+		for (CClassInfo classInfo : model.beans().values()) {
+			if (classInfo.fullName().equals(PACKAGE_GX + ".TourPrimitive") && !classInfo.isAbstract()) {
+				classInfo.setAbstract();
+				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " Found gxTourPrimtive class, set abstract!");
+				break;
+			}
+		}
+//		
 //		for (CClassInfo classInfo : model.beans().values()) {
-//			List<CPropertyInfo> properties = classInfo.getProperties();
-//			for (CPropertyInfo c : properties) {
-//				// if (jFieldVar.name().equals("icon") && jFieldVar.type().fullName().equals("de.micromata.opengis.kml.v_2_2_0.Link")) {
-//
-//				if (c.getName(false).equals("icon")) {
-//					if (c instanceof CElementPropertyInfo) {
-//
-//						CElementPropertyInfo info = (CElementPropertyInfo) c;
-//
-//						List<CTypeRef> types = info.getTypes();
-//
-//						CTypeRef defaultValue = null;
-//						for (CTypeRef cTypeRef : types) {
-//
-//							defaultValue = new CTypeRef(classLink, new QName(cTypeRef.getTagName().getLocalPart()), new QName(c.displayName()), true,
-//							    null);
-//							System.out.println("->>>>>>>>>>>>>> " + c.displayName());
-//							System.out.println("->>>>>>>>>>>>>> " + cTypeRef.getTagName());
-//							System.out.println("->>>>>>>>>>>>>> " + cTypeRef.getTarget().getType().fullName());
-//							System.out.println("->>>>>>>>>>>>>> " + cTypeRef.getTarget().getType().getClass().getName());
-//							if (cTypeRef.getTarget().getType() instanceof CClassInfo) {
-//								CClassInfo type = (CClassInfo) cTypeRef.getTarget().getType();
-//								System.out.println("->>>>>>>>>>>>++++++++++>> " + type.fullName());
-//							}
-//
-//						}
-//						types.clear();
-//						// types.add(defaultValue);
-//
-//					}
-//				}
+//			if (classInfo.fullName().equals(PACKAGE_GX + ".Playlist")) {
+//				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " Found Playlist class!");
+//				List<CPropertyInfo> properties = classInfo.getProperties();
+//				for (CPropertyInfo cPropertyInfo : properties) {
+//					LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " > " + cPropertyInfo.kind(). + " " + cPropertyInfo.getName(true));
+//        }
+//				break;
 //			}
 //		}
 
+		for (CEnumLeafInfo classInfo : model.enums().values()) {
+			if (classInfo.fullName().equals(PACKAGE_KML + ".AltitudeMode")) {
+				altitudeModeKML = classInfo;
+				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " Found AltitudeMode in KML package");
+				continue;
+			}
+			if (classInfo.fullName().equals(PACKAGE_GX + ".AltitudeMode")) {
+				altitudeModeGX = classInfo;
+				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " Found AltitudeMode in GX package");
+				continue;
+			}
+			
+			
+		}
+		assert mainPackage != null;
 		assert classLink != null;
+		assert altitudeModeKML != null;
+		assert altitudeModeGX != null;
 		CBuiltinLeafInfo doubleValue = CBuiltinLeafInfo.DOUBLE;
 
 		XSSchema schema = model.schemaComponent.getSchema("http://www.opengis.net/kml/2.2");
 
-		System.out.println("--------------------------");
-		System.out.println("----- Icon customizations--------------------");
-		CCustomizations customizations = classLink.getCustomizations();
-		for (CPluginCustomization cPluginCustomization : customizations) {
-			System.out.println("-->cc: " + cPluginCustomization.toString());
-			System.out.println("-->et: " + cPluginCustomization.element.getTagName());
-			System.out.println("-->el: " + cPluginCustomization.element.getLocalName());
-			System.out.println("-->et: " + cPluginCustomization.element.getNodeType());
-			System.out.println("-->eV: " + cPluginCustomization.element.getNodeValue());
-			System.out.println("-->eT: " + cPluginCustomization.element.toString());
-			System.out.println("-->lp: " + cPluginCustomization.locator.getPublicId());
-			System.out.println("-->ls: " + cPluginCustomization.locator.getSystemId());
-			System.out.println("-->lT: " + cPluginCustomization.locator.toString());
-		}
-		System.out.println("--------------------------");
-		System.out.println("--------------------------");
-		System.out.println("-------Icon properties ------------------");
-
+		LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " -------Icon properties ------------------");
 		CClassInfoParent cClassInfoParentLink = classLink.parent();
 
 		CClassInfo iconClass = new CClassInfo(model, cClassInfoParentLink, "Icon", null, new QName("Icon"), null, schema, new CCustomizations());
 		iconClass.setBaseClass(classLink.getBaseClass());
 
+		//fill icon class with the properties defined in link class
 		List<CPropertyInfo> properties = classLink.getProperties();
-
 		for (CPropertyInfo c : properties) {
-
-			System.out.println("-->:t " + c.baseType);
-			System.out.println("-->:javadoc:     " + c.javadoc);
-			System.out.println("-->:displayname: " + c.displayName());
-			System.out.println("-->:getName:     " + c.getName(true));
-			System.out.println("-->:lpublic      " + c.locator.getPublicId());
-			System.out.println("-->:lsystem      " + c.locator.getSystemId());
-			System.out.println("-->:ltoString    " + c.locator.toString());
-			System.out.println("-->:r            " + c.realization.toString());
-			System.out.println("-->:i            " + c.id());
-			System.out.println("-->:k            " + c.kind().name());
-			System.out.println("-->:k            " + c.kind().toString());
-			System.out.println("-->:mimetype     " + c.getExpectedMimeType());
-			System.out.println("-->:locator      " + c.getLocator());
-
-			// CElementPropertyInfo refreshIntervalElement = new CElementPropertyInfo(c.getName(true),
-			// CollectionMode.NOT_REPEATED,c.id(),c.getExpectedMimeType(), null, c.getCustomizations(), c.getLocator(), false); //, doubleValue,
-			// null, false);
 			iconClass.addProperty(c);
-			// cc3.addProperty(refreshIntervalElement);
-
 		}
-
-		System.out.println("--------------------------");
-		//		
-
-		// CValuePropertyInfo refreshInterval = new CValuePropertyInfo("RefreshIntervalValue", null, new CCustomizations(), null, doubleValue,
-		// null);
-		// cc3.addProperty(refreshInterval);
-
-		// CElementPropertyInfo(String name,
-		// CollectionMode collection,
-		// ID id,
-		// MimeType expectedMimeType,
-		// XSComponent source,
-		// CCustomizations customizations,
-		// Locator locator,
-		// boolean required)
-
-		// refreshInterval.
-		// cc3.addProperty(refreshInterval);
-		// CElementPropertyInfo cElementPropertyInfo = new CElementPropertyInfo("refreshMode",null,null,null,null,new
-		// CCustomizations(),null,false);
-		// cc3.addProperty(cElementPropertyInfo);
-
+		
+		Collection<CEnumConstant> constants = altitudeModeGX.getConstants();
+		for (CEnumConstant cEnumConstant : constants) {
+			altitudeModeKML.members.add( new CEnumConstant(cEnumConstant.getName(), null, cEnumConstant.getLexicalValue(), null, null, null));
+    }
+		
+		//model.enums().remove(altitudeModeGX.fullName());
+		
+//		altitudeModeKML.javadoc
+		Collection<CEnumConstant> constantsKML = altitudeModeKML.getConstants();
+		for (CEnumConstant cEnumConstant : constantsKML) {
+			LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " altitudeMode property: " + cEnumConstant.getLexicalValue());
+    }
+		
+//		altitudeModeGX.parent.getOwnerPackage().remove(altitudeModeGX.);
+		
+		
 		QName qNameCoordinate = new QName("http://www.opengis.net/kml/2.2", "Coordinate");
 		QName qNameLongitude = new QName("PerlPleaseRemoveMeLongitude");
 		QName qNameLatitude = new QName("PerlPleaseRemoveMeLatitude");
 		QName qNameAltitude = new QName("PerlPleaseRemoveMeAltitude");
 		CClassInfo cc4 = new CClassInfo(model, cClassInfoParentLink, "Coordinate", null, qNameCoordinate, null, schema, new CCustomizations());
 
-		// test = new FlorisDouble(model,"double");
-
-		System.out.println(":::::::::::::::::::::::::::::::::: " + doubleValue.getType().fullName());
+		//LOG.info(":::::::::::::::::::::::::::::::::: " + doubleValue.getType().fullName());
 
 		CAttributePropertyInfo cAttributeLongitude = new CAttributePropertyInfo("longitude", null, new CCustomizations(), null, qNameLongitude,
 		    doubleValue, null, false);
@@ -237,12 +200,7 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 		cc4.addProperty(cAttributeAltitude);
 	}
 
-	/**
-	 * return the Java type for the given type reference in the model.
-	 */
-	private JType resolve(ClassOutlineImpl outline, CTypeRef typeRef) {
-		return outline.parent().resolve(typeRef, Aspect.IMPLEMENTATION);
-	}
+
 
 	/**
 	 * Returns the option string used to turn on this plugin.
@@ -308,7 +266,7 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 		mCommand.add(new CreateOwnObjectFactory(outline, opts, errorHandler, pool));
 		mCommand.add(new CreateMarshalAndUnmarshal(outline, opts, errorHandler, pool));
 		mCommand.add(new CreateCreateAndAddMethodsForCoordinates(outline, opts, errorHandler, pool));
-		//mCommand.add(new DefaultValuePlugin(outline, opts, errorHandler, pool));
+		// mCommand.add(new DefaultValuePlugin(outline, opts, errorHandler, pool));
 		mCommand.add(new AddProperJavaDocumentationForKML(outline, opts, errorHandler, pool));
 
 		for (Command command : mCommand) {

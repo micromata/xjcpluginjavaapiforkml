@@ -31,8 +31,17 @@ import com.sun.xml.xsom.XSAttributeUse;
 import com.sun.xml.xsom.XSParticle;
 
 public class Util {
-	private static final Logger LOG = Logger.getLogger(Util.class.getName());
+	//private static final Logger LOG = Logger.getLogger(Util.class.getName());
 
+	public static void logInfo(Class< ? > cazz, String output) {
+		Logger LOG = Logger.getLogger(cazz.getName());
+	  LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " " + output);
+  }
+	
+	public static void logInfo(String output) {
+		Logger LOG = Logger.getLogger(Util.class.getName());
+	  LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " " + output);
+  }
 	public static String calculateMethodName(ClassOutlineImpl cc, JPackage rootPackage) {
 		String tmppackagePrefix = "";
 		 if (!cc._package()._package().name().equals(rootPackage.name())) {
@@ -158,7 +167,7 @@ public class Util {
 			}
 
 			if (field.name().equals("AbstractObject")) {
-				LOG.info("skip abstract object");
+				logInfo(Util.class, "skip abstract object");
 				continue;
 			}
 
@@ -221,7 +230,7 @@ public class Util {
 //		}
 
 		if (field.name().equals("AbstractObject")) {
-			LOG.info("skip abstract object");
+			logInfo("skip abstract object");
 			return false;
 		}
 		return true;
@@ -425,7 +434,7 @@ public class Util {
 	public static HashMap<String, ArrayList<CClassInfo>> findSubClasses(Outline outline) {
 		// Logger LOG = Logger.getLogger(MoveAbstractClassesInOwnPackage.class.getName());
 		HashMap<String, ArrayList<CClassInfo>> peter = new HashMap<String, ArrayList<CClassInfo>>();
-		LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " search for classses with subclasses: ");
+		logInfo("search for classses with subclasses: ");
 		for (final ClassOutline classOutline : outline.getClasses()) {
 			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 			String currentClass = Util.eliminateTypeSuffix(cc.target.shortName);
@@ -436,7 +445,7 @@ public class Util {
 			peter.put(currentClass, listSubclasses);
 
 			// from here only debug stuff
-			sb.append(XJCJavaForKmlApiPlugin.PLUGINNAME + " > " + currentClass + " \t");
+			sb.append(" > " + currentClass + " \t");
 			if (listSubclasses.size() == 0) {
 				continue;
 			}
@@ -448,7 +457,7 @@ public class Util {
 				sb.delete(sb.length() - 2, sb.length());
 			}
 			sb.append("]");
-			LOG.info(sb.toString());
+			logInfo(sb.toString());
 
 		}
 

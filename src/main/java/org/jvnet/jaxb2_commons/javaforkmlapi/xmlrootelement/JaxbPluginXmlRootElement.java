@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
@@ -22,6 +23,7 @@ import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.EnumOutline;
 import com.sun.tools.xjc.outline.Outline;
+import com.sun.tools.xjc.outline.PackageOutline;
 
 import de.micromata.javaapiforkml.JaxbTool;
 
@@ -40,12 +42,17 @@ import de.micromata.javaapiforkml.JaxbTool;
 		/** load from this file */
 		public static String LOADJAVADOCSFROMFILE = "src/main/resources/schema/kmljavadocs.xml";
 
-		private HashMap<String, String> quickAndSimpleAnnotateTheseElementsWithXmlRootElement;
+		private HashMap<String, String> annotateTheseElementsDifferent;
 
 		
 		public JaxbPluginXmlRootElement(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
 			super(outline, opts, errorHandler, pool);
-
+			Iterable< ? extends PackageOutline> allPackageContexts = this.outline.getAllPackageContexts();
+			for (PackageOutline packageOutline : allPackageContexts) {
+	     
+	      
+	      LOG.info("f<<<<>>>>>>>>>>>>>>>>" + packageOutline.getMostUsedNamespaceURI() );
+      }
 			cm = outline.getCodeModel();
 		}
 
@@ -58,59 +65,15 @@ import de.micromata.javaapiforkml.JaxbTool;
 			LOG.info("file to load (" + LOADJAVADOCSFROMFILE + ") not found. ");
 			LOG.info("using hard-coded values.");
 
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement = new HashMap<String, String>();
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("camera", "Camera");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("document", "Document");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("folder", "Folder");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("groundoverlay", "GroundOverlay");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("kml", "kml");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("linearring", "LienarRing");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("linestring", "LineString");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("lookat", "LookAt");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("model", "Model");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("multigeometry", "MultiGeometry");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("networklink", "NetworkLink");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("photooverlay", "PhotoOverlay");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("placemark", "Placemark");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("point", "Point");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("polygon", "Polygon");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("screenoverlay", "ScreenOverlay");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("stylemap", "StyleMap");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("style", "Style");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("timespan", "TimeSpan");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("timestamp", "TimeStamp");
-
-			//needed for tests
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("balloonstyle", "BalloonStyle");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("labelstyle", "LabelStyle");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("extendeddata", "ExtendedData");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("link", "Link");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("latlonbox", "LatLonBox");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("iconstyle", "IconStyle");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("linestyle", "LineStyle");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("liststyle", "ListStyle");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("location", "Location");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("orientation", "Orientation");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("scale", "Scale");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("alias", "Alias");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("networklinkcontrol", "NetworkLinkControl");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("icon", "Icon");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("polystyle", "PolyStyle");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("latlonaltbox", "LatLonAltBox");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("lod", "Lod");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("region", "Region");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("schema", "Schema");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("pair", "Pair");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("networkLinkcontrol", "NetworkLinkControl");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("update", "Update");
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("region", "Region");
-
-			// seperate the enums!?!?!?
-			quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("altitudemode", "altitudeMode");
+			annotateTheseElementsDifferent = new HashMap<String, String>();
+			annotateTheseElementsDifferent.put("kml", "kml");
+			annotateTheseElementsDifferent.put("link", "Link");
+			annotateTheseElementsDifferent.put("icon", "Icon");
+			//annotateTheseElementsDifferent.put("altitudemode", "altitudeMode");
 //		}
 
 		for (final EnumOutline classOutline : outline.getEnums()) {
-			annotateEnums(classOutline);
+		//	annotateEnums(classOutline);
 		}
 
 		for (final ClassOutline classOutline : outline.getClasses()) {
@@ -119,7 +82,7 @@ import de.micromata.javaapiforkml.JaxbTool;
 
 	}
 
-	private String eliminateTypeSuffix(String namewithoutType) {
+	private String eliminateTypeSuffixLowercase(String namewithoutType) {
 		// if ($currentJavaFile[$i] =~ s/(.*?<)(JAXBElement<. extends )(.*?)(>)(.*?)/$1$3$5/g) {
 		// if ($currentJavaFile[$i] =~ s/(.*?)(JAXBElement<\? extends )(.*?)(>)(.*?)/$1$3$5/g) {
 		// if ($currentJavaFile[$i] =~ s/(.*?)(JAXBElement<)(.*?)(>)(.*?)/$1$3$5/g) {
@@ -136,48 +99,87 @@ import de.micromata.javaapiforkml.JaxbTool;
 		}
 		return namewithoutType;
 	}
+	
 
-	private void annotateEnums(final EnumOutline classOutline) {
+	private String eliminateTypeSuffixCaseSensitive(String namewithoutType) {
+		// if ($currentJavaFile[$i] =~ s/(.*?<)(JAXBElement<. extends )(.*?)(>)(.*?)/$1$3$5/g) {
+		// if ($currentJavaFile[$i] =~ s/(.*?)(JAXBElement<\? extends )(.*?)(>)(.*?)/$1$3$5/g) {
+		// if ($currentJavaFile[$i] =~ s/(.*?)(JAXBElement<)(.*?)(>)(.*?)/$1$3$5/g) {
+		namewithoutType = namewithoutType.replaceAll("(.*?)(JAXBElement<. extends )(.*?)(>)(.*?)", "$1$3$5");
 
-		String currentClassName = eliminateTypeSuffix(classOutline.clazz.name().toLowerCase());
+		if (namewithoutType.endsWith("Type")) {
+			namewithoutType = namewithoutType.substring(0, namewithoutType.length() - 4);
+		}
+		if (namewithoutType.endsWith("Enum")) {
+			namewithoutType = namewithoutType.substring(0, namewithoutType.length() - 4);
+		}
+		if (namewithoutType.startsWith("Abstract")) {
+			namewithoutType = namewithoutType.substring(8, namewithoutType.length());
+		}
+		return namewithoutType;
+	}
+
+
+	private void annotateEnums(final EnumOutline cc) {
+
+		String currentClassName = eliminateTypeSuffixCaseSensitive(cc.clazz.name().toLowerCase());
 		// LOG.info("[JaxbPluginXmlRootElement] " + currentClassName );
-		if (quickAndSimpleAnnotateTheseElementsWithXmlRootElement.containsKey(currentClassName)) {
-			if (classOutline.target.isElement()) {
-				LOG.info("> skipped " + classOutline.target.shortName + " because class is already annotated.");
+		//if (quickAndSimpleAnnotateTheseElementsWithXmlRootElement.containsKey(currentClassName)) {
+			if (cc.target.isElement()) {
+				LOG.info("> skipped " + cc.target.shortName + " because class is already annotated.");
 				return;
 			}
 
-			String mostUsedNamespaceURI = classOutline._package().getMostUsedNamespaceURI();
-			String xmlRootElementName = quickAndSimpleAnnotateTheseElementsWithXmlRootElement.get(currentClassName);
+			String xmlRootElementName = null;
+			if (annotateTheseElementsDifferent.containsKey(currentClassName)) {
+				xmlRootElementName = annotateTheseElementsDifferent.get(currentClassName);
+			} else {
+				xmlRootElementName = eliminateTypeSuffixCaseSensitive(cc.clazz.name());
+			}	
+			
+			String mostUsedNamespaceURI = cc._package().getMostUsedNamespaceURI();
 			// [RESULT]
 			// @XmlRootElement(name = "foo", namespace = "bar://baz")
-			XmlRootElementWriter xrew = classOutline.clazz.annotate2(XmlRootElementWriter.class);
+			XmlRootElementWriter xrew = cc.clazz.annotate2(XmlRootElementWriter.class);
 			xrew.name(xmlRootElementName);
-			xrew.namespace(mostUsedNamespaceURI);
-			LOG.info("> added @XmlRootElement(name = '" + xmlRootElementName + "', namespace = '" + mostUsedNamespaceURI + "')");
+			//xrew.namespace(mostUsedNamespaceURI);
+			LOG.info("E> added @XmlRootElement(name = '" + xmlRootElementName + "', namespace = '" + mostUsedNamespaceURI + "')");
 			// LOG.info("> added @XmlRootElement(name = '" + xmlRootElementName + "')");
-		}
+		//}
 	}
 
 	private void annotateClasses(final ClassOutlineImpl cc) {
-		String currentClassName = eliminateTypeSuffix(cc.implRef.name().toLowerCase());
+		String currentClassName = eliminateTypeSuffixLowercase(cc.implRef.name().toLowerCase());
 		// LOG.info("[JaxbPluginXmlRootElement] " + currentClassName );
-		if (quickAndSimpleAnnotateTheseElementsWithXmlRootElement.containsKey(currentClassName)) {
 			if (cc.target.isElement()) {
 				LOG.info("> skipped " + cc.target.getName() + " because class is already annotated.");
 				return;
 			}
+			
+			if (cc.target.isAbstract()) {
+				LOG.info("> skipped " + cc.target.getName() + " because class is abstract.");
+				return;
+			}
+			
+//			cc.target.get
 
+			String xmlRootElementName = null;
+			if (annotateTheseElementsDifferent.containsKey(currentClassName)) {
+				xmlRootElementName = annotateTheseElementsDifferent.get(currentClassName);
+			} else {
+				xmlRootElementName = eliminateTypeSuffixCaseSensitive(cc.implRef.name());
+			}	
 			String mostUsedNamespaceURI = cc._package().getMostUsedNamespaceURI();
-			String xmlRootElementName = quickAndSimpleAnnotateTheseElementsWithXmlRootElement.get(currentClassName);
 			// [RESULT]
 			// @XmlRootElement(name = "foo", namespace = "bar://baz")
 			XmlRootElementWriter xrew = cc.implClass.annotate2(XmlRootElementWriter.class);
 			xrew.name(xmlRootElementName);
+			//if (!mostUsedNamespaceURI.equals("http://www.opengis.net/kml/2.2")) {
 			xrew.namespace(mostUsedNamespaceURI);
-			LOG.info("> added @XmlRootElement(name = '" + xmlRootElementName + "', namespace = '" + mostUsedNamespaceURI + "')");
+			//}
+			LOG.info("C> added @XmlRootElement(name = '" + xmlRootElementName + "', namespace = '" + mostUsedNamespaceURI + "')");
 			// LOG.info("> added @XmlRootElement(name = '" + xmlRootElementName + "')");
-		}
+		
 	}
 
 	private HashMap<String, String> getObjectsFromXmlWithJaxb(String loadJavaDocsFromFile) {

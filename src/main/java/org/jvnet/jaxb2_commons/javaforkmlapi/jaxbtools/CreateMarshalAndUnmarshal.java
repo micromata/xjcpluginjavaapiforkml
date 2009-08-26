@@ -336,7 +336,9 @@ public class CreateMarshalAndUnmarshal extends Command {
 		namespacebeautyfiergetpreferredprefix.body()._if(namespaceuri.invoke("matches").arg("urn:oasis:names:tc:ciq:xsdschema:xAL:.*?"))
 		    ._then()._return(JExpr.lit("xal"));
 		namespacebeautyfiergetpreferredprefix.body()._if(namespaceuri.invoke("matches").arg("http://www.google.com/kml/ext/.*?"))._then()
-		    ._return(JExpr.lit("gx"));
+    ._return(JExpr.lit("gx"));
+		//namespacebeautyfiergetpreferredprefix.body()._if(namespaceuri.invoke("matches").arg("http://www.opengis.net/kml/.*?"))._then()
+    //._return(JExpr.lit("kml"));
 		namespacebeautyfiergetpreferredprefix.body()._return(JExpr._null());
 		return namespacebeautyfier;
 	}
@@ -455,12 +457,12 @@ public class CreateMarshalAndUnmarshal extends Command {
 		tryBlock.body().assign(mVar, JExpr._this().invoke(createMashaller));
 
 		// JAXBElement<Kml> jaxbRootElement = new JAXBElement<Kml>(new QName("http://www.opengis.net/kml/2.2", "kml"), Kml.class, this);
-		JInvocation newJaxbElement = JExpr._new(jaxbElementClass).arg(createQName("http://www.opengis.net/kml/2.2", "kml")).arg(
-		    kmlClass.boxify().dotclass()).arg(JExpr._this());
-		final JVar jaxbRootElementVar = tryBlock.body().decl(jaxbElementClass, "jaxbRootElement", newJaxbElement);
+//		JInvocation newJaxbElement = JExpr._new(jaxbElementClass).arg(createQName("http://www.opengis.net/kml/2.2", "kml")).arg(
+//		    kmlClass.boxify().dotclass()).arg(JExpr._this());
+//		final JVar jaxbRootElementVar = tryBlock.body().decl(jaxbElementClass, "jaxbRootElement", newJaxbElement);
 
 		// m.marshal(jaxbRootElement, outputStream);
-		tryBlock.body().add(mVar.invoke("marshal").arg(jaxbRootElementVar).arg(systemClass.boxify().staticRef("out")));
+		tryBlock.body().add(mVar.invoke("marshal").arg(JExpr._this()).arg(systemClass.boxify().staticRef("out")));
 
 		// return true;
 		tryBlock.body()._return(JExpr.TRUE);
@@ -487,12 +489,12 @@ public class CreateMarshalAndUnmarshal extends Command {
 		tryBlock.body().assign(mVar, JExpr._this().invoke(createMashaller));
 
 		// JAXBElement<Kml> jaxbRootElement = new JAXBElement<Kml>(new QName("http://www.opengis.net/kml/2.2", "kml"), Kml.class, this);
-		JInvocation newJaxbElement = JExpr._new(jaxbElementClass).arg(createQName("http://www.opengis.net/kml/2.2", "kml")).arg(
-		    kmlClass.boxify().dotclass()).arg(JExpr._this());
-		final JVar jaxbRootElementVar = tryBlock.body().decl(jaxbElementClass, "jaxbRootElement", newJaxbElement);
+//		JInvocation newJaxbElement = JExpr._new(jaxbElementClass).arg(createQName("http://www.opengis.net/kml/2.2", "kml")).arg(
+//		    kmlClass.boxify().dotclass()).arg(JExpr._this());
+//		final JVar jaxbRootElementVar = tryBlock.body().decl(jaxbElementClass, "jaxbRootElement", newJaxbElement);
 
 		// m.marshal(jaxbRootElement, outputStream);
-		tryBlock.body().add(mVar.invoke("marshal").arg(jaxbRootElementVar).arg(value));
+		tryBlock.body().add(mVar.invoke("marshal").arg(JExpr._this()).arg(value));
 
 		// return true;
 		tryBlock.body()._return(JExpr.TRUE);

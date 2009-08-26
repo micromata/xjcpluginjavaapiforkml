@@ -2,6 +2,8 @@ package org.jvnet.jaxb2_commons.javaforkmlapi;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElementRef;
+
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
 import org.xml.sax.ErrorHandler;
@@ -43,6 +45,8 @@ public class ConvertComplexTypesToSimpleTypes extends Command {
 	public void execute() {
 		for (final ClassOutline classOutline : outline.getClasses()) {
 			convertComplexTypesToSimpleTypes((ClassOutlineImpl) classOutline);
+			
+			
 		}
 
 	}
@@ -74,9 +78,19 @@ public class ConvertComplexTypesToSimpleTypes extends Command {
 			if (jFieldVar.type().fullName().equals(lookForType)) {
 				jFieldVar.type(replaceWithThisType);
 				replacedTypes++;
-				// LOG.info("jFieldVar:   " + jFieldVar.name());
-				// LOG.info("jFieldVar is " + jFieldVar.type().fullName());
 			}
+//			if (implClass.name().equals("Playlist")) { 
+//				if (jFieldVar.name().equals("tourPrimitive")) { 
+//				
+//			 LOG.info("!!!!!!!!!!!! jFieldVar:   " + jFieldVar.name());
+//			 LOG.info("!!!!!!!!!!!! jFieldVar is " + jFieldVar.type().fullName());
+//			 
+//			 jFieldVar.annotate(XmlElementRef.class).param("name", "AbstractTourPrimitiveGroup");
+//				}
+//			}
+//			if () {
+//				
+//			}
 		}
 
 		for (final JMethod jFieldVar : implClass.methods()) {

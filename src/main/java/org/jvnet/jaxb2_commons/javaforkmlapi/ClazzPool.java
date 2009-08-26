@@ -11,28 +11,32 @@ import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JPackage;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
+import com.sun.tools.xjc.model.CEnumLeafInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
+import com.sun.tools.xjc.outline.EnumOutline;
 import com.sun.tools.xjc.outline.Outline;
 import com.sun.tools.xjc.util.CodeModelClassFactory;
 
-
 public class ClazzPool {
 	private JDefinedClass classObviousAnnotation;
+
 	private JDefinedClass classCoordinateConverter;
+
 	private JDefinedClass classCoordinate;
+
 	private JDefinedClass classIcon;
+
 	private JDefinedClass classLink;
 
 	public ClazzPool(Outline outline) {
-	  JPackage kmlpackage = Util.getKmlClassPackage(outline);
+		JPackage kmlpackage = Util.getKmlClassPackage(outline);
 		CodeModelClassFactory classFactory = outline.getClassFactory();
-		JPackage ppp = outline.getCodeModel()._package(kmlpackage.getPackage().name()+".annotations");
+		JPackage ppp = outline.getCodeModel()._package(kmlpackage.getPackage().name() + ".annotations");
 		classObviousAnnotation = classFactory.createClass(ppp, JMod.PUBLIC, "Obvious", null, ClassType.ANNOTATION_TYPE_DECL);
-		classObviousAnnotation.annotate(Target.class).param("value",ElementType.FIELD).param("value", ElementType.METHOD);
-		//@Target({FIELD, METHOD})
-		classCoordinateConverter = classFactory.createClass(kmlpackage, JMod.PUBLIC | JMod.FINAL, "CoordinatesConverter", null, ClassType.CLASS);
+		classObviousAnnotation.annotate(Target.class).param("value", ElementType.FIELD).param("value", ElementType.METHOD);
+		classCoordinateConverter = classFactory
+		    .createClass(kmlpackage, JMod.PUBLIC | JMod.FINAL, "CoordinatesConverter", null, ClassType.CLASS);
 
-		
 		for (final ClassOutline classOutline : outline.getClasses()) {
 			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 
@@ -40,50 +44,42 @@ public class ClazzPool {
 				System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + " Coordinate class found.");
 				classCoordinate = cc.implClass;
 				classCoordinate.methods().clear();
-				// Iterator constructors = iconClass.constructors();
-				// final JMethod stringArgConstructor = iconClass.constructor(JMod.PUBLIC);
 				continue;
 			}
-			
+
 			if (cc.implRef.name().equals("Icon")) {
 				System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + " Icon class found.");
 				classIcon = cc.implClass;
 				continue;
 			}
-			
+
 			if (cc.implRef.name().equals("Link")) {
 				System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + " Link class found.");
 				classLink = cc.implClass;
 				continue;
 			}
-			
+
 		}
-		
-		
-		// classCoordinate = classFactory.createClass(kmlpackage, JMod.PUBLIC, "Coordinate", null, ClassType.CLASS);
 	}
-	
+
 	public JDefinedClass getClassObviousAnnotation() {
-  	return classObviousAnnotation;
-  }
+		return classObviousAnnotation;
+	}
 
 	public JDefinedClass getClassCoordinateConverter() {
-  	return classCoordinateConverter;
-  }
+		return classCoordinateConverter;
+	}
 
 	public JDefinedClass getClassCoordinate() {
-  	return classCoordinate;
-  }
-
+		return classCoordinate;
+	}
 
 	public JDefinedClass getClassIcon() {
-	  return classIcon;
-  }
-
-	
+		return classIcon;
+	}
 
 	public JDefinedClass getClassLink() {
-	  return classLink;
-  }
+		return classLink;
+	}
 
 }
