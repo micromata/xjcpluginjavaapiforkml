@@ -33,6 +33,7 @@ import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.Util;
 import org.jvnet.jaxb2_commons.javaforkmlapi.XJCJavaForKmlApiPlugin;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
@@ -144,6 +145,8 @@ public class CreateMarshalAndUnmarshal extends Command {
 
 	private JType urlDecoderClass;
 
+	private JType contentHandlerClass;
+
 	public CreateMarshalAndUnmarshal(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 	}
@@ -179,6 +182,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 		streamSourceClass = codeModel._ref(StreamSource.class);
 		fileClass = codeModel._ref(File.class);
 		stringReaderClass = codeModel._ref(StringReader.class);
+		contentHandlerClass = codeModel._ref(ContentHandler.class);
 		writerClass = codeModel._ref(Writer.class);
 
 		xmlConstantsClass = codeModel._ref(XMLConstants.class);
@@ -397,6 +401,17 @@ public class CreateMarshalAndUnmarshal extends Command {
 		comment.add("The object is not saved as a zipped .kmz file.\n");
 		comment.add("@see marshalKmz(String, Kml...)");
 		generateMarshal(cc, writerClass, comment);
+		comment.clear();
+		
+		
+		comment.add("Java to KML\n");
+		comment.add("The object graph is marshalled to a Contenthandler object.\n");
+		comment.add("Useful if  marshaller cis needed to generate CDATA blocks.\n");
+		comment.add("{@link https://jaxb.dev.java.net/faq/}\n");
+		comment.add("{@link http://code.google.com/p/javaapiforkml/issues/detail?id=7}\n");
+		comment.add("The object is not saved as a zipped .kmz file.\n");
+		comment.add("@see marshalKmz(String, Kml...)");
+		generateMarshal(cc, contentHandlerClass, comment);
 		comment.clear();
 
 		comment.add("Java to KML\n");
