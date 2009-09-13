@@ -163,16 +163,7 @@ public class AddProperJavaDocumentationForKML extends Command {
 					String subSequence = jmethod.name().substring(3, jmethod.name().length());
 					// if (classOutline.implRef._package().name())
 					//				
-					// ClassOutlineImpl classOutlineImpl = classList.get(subSequence);
-					// LOG.info("" + classList.keySet());
-					// if (classOutlineImpl != null) {
-					// LOG.info("i-!> " + classOutline.implClass.name() + " !> " + jmethod.name() + " ¡> "+ subSequence + " c:" +
-					// classOutlineImpl.implClass.name());
-					// } else {
-					// LOG.info("e-!> " + classOutline.implClass.name() + " !> " + jmethod.name() + " ¡> "+ subSequence);
-					//					
-					// }
-
+				
 					jmethod.javadoc().clear();
 					// jmethod.javadoc().addDeprecated();
 					jmethod.javadoc().add("@see " + Util.lowerFirst(subSequence));

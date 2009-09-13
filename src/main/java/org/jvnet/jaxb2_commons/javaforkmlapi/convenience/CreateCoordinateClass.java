@@ -1,58 +1,30 @@
-// ///////////////////////////////////////////////////////////////////////////
-//
-// $RCSfile: $
-//
-// Project JaxbPluginJavaForKmlApi
-//
-// Author Flori (f.bachmann@micromata.de)
-// Created 20.03.2009
-// Copyright Micromata 20.03.2009
-//
-// $Id: $
-// $Revision: $
-// $Date: $
-//
-// ///////////////////////////////////////////////////////////////////////////
 package org.jvnet.jaxb2_commons.javaforkmlapi.convenience;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
-import org.jvnet.jaxb2_commons.javaforkmlapi.CreateEqualsAndHashCode;
 import org.jvnet.jaxb2_commons.javaforkmlapi.Util;
-import org.jvnet.jaxb2_commons.javaforkmlapi.XJCJavaForKmlApiPlugin;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
 import org.xml.sax.ErrorHandler;
 
-import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClass;
-import com.sun.codemodel.JClassContainer;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JForEach;
-import com.sun.codemodel.JForLoop;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
-import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
 import com.sun.tools.xjc.outline.ClassOutline;
-import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
-import com.sun.tools.xjc.util.CodeModelClassFactory;
 
 public class CreateCoordinateClass extends Command {
 	private static final Logger LOG = Logger.getLogger(CreateCoordinateClass.class.getName());
@@ -63,7 +35,7 @@ public class CreateCoordinateClass extends Command {
 	@SuppressWarnings("unchecked")
 	protected Class collectionClass = java.util.ArrayList.class;
 
-	private JCodeModel cm;
+	private final JCodeModel cm;
 
 	private JFieldVar longitude;
 
@@ -146,12 +118,19 @@ public class CreateCoordinateClass extends Command {
 
 		final JMethod stringArgConstructor = coordinateClass.constructor(JMod.PUBLIC);
 		final JVar stringConstructorArg = stringArgConstructor.param(JMod.FINAL, String.class, "coordinates");
+		
+		//		http://code.google.com/p/javaapiforkml/issues/detail?id=10
+		//		changed:
+		//			String[] coords = coordinates.replaceAll(",[ ]+?", ",").trim().split(",");
+		//			to:
+		//			String[] coords = coordinates.replaceAll(",\\s+", ",").trim().split(",");
 		JVar varCoords = stringArgConstructor.body().decl(stringClass.array(), "coords",
-		    stringConstructorArg.invoke("replaceAll").arg(",[ ]+?").arg(",").invoke("trim").invoke("split").arg(","));
+		    stringConstructorArg.invoke("replaceAll").arg(",\\s+").arg(",").invoke("trim").invoke("split").arg(","));
 		// CODE: if ((coords < 1) && (coords > 3)) {throw IllegalArgumentException}
 		stringArgConstructor.body()._if(
 		    JExpr.ref(varCoords.name()).ref("length").lt(JExpr.lit(1)).cand(JExpr.ref(varCoords.name()).ref("length").gt(JExpr.lit(3))))
 		    ._then()._throw(JExpr._new(illegalArgumentExceptionClass));
+		
 		stringArgConstructor.body().assign(JExpr.refthis(longitude.name()),
 		    JExpr.ref("Double").invoke("parseDouble").arg(JExpr.direct("coords[0]")));
 		stringArgConstructor.body().assign(JExpr.refthis(latitude.name()),
@@ -210,8 +189,13 @@ public class CreateCoordinateClass extends Command {
 		unmarshall._throws(Exception.class);
 		unmarshall.annotate(Override.class);
 
+		//		http://code.google.com/p/javaapiforkml/issues/detail?id=10
+		//		changed:
+		//			String[] coords = s.replaceAll(",[ ]+?", ",").trim().split(" ");
+		//			to:
+		//			String[] coords = s.replaceAll(",\\s+", ",").trim().split("\\s+");
 		JVar varCoords1 = unmarshall.body().decl(stringClass.array(), "coords",
-		    unmarshallparam.invoke("replaceAll").arg(",[ ]+?").arg(",").invoke("trim").invoke("split").arg(" "));
+		    unmarshallparam.invoke("replaceAll").arg(",[\\s]+").arg(",").invoke("trim").invoke("split").arg("\\s+"));
 
 		JVar coordinateslist = unmarshall.body().decl(listGenericsCoordinates, "coordinates", JExpr._new(arraylistGenericsCoordinates));
 		unmarshall.body()._if(JExpr.ref(varCoords1.name()).ref("length").lte(JExpr.lit(0)))._then().block()._return(coordinateslist);

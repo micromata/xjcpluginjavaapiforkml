@@ -57,7 +57,7 @@ public class CreateIconClass extends Command {
 		for (final ClassOutline classOutline : outline.getClasses()) {
 			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 			if (cc.implRef.name().equals("Icon") && cc.implClass._extends().name().equals("BasicLink")) {
-				System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + " link class found.");
+				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " link class found.");
 				elementType = cc.implClass;
 			}
 		}
@@ -66,7 +66,7 @@ public class CreateIconClass extends Command {
 			
 			for (final JFieldVar jFieldVar : classOutline.implClass.fields().values()) {
 				if (jFieldVar.name().equals("icon") && shouldItBeAnIcon(jFieldVar.type())) {
-					System.out.println(XJCJavaForKmlApiPlugin.PLUGINNAME + " usage of link class found." + classOutline.implClass.fullName());
+					LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " usage of link class found." + classOutline.implClass.fullName());
 					jFieldVar.type(elementType);
 				}
 
