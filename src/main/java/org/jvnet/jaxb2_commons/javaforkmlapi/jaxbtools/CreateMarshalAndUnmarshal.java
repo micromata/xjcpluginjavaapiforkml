@@ -594,7 +594,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 		JVar varEntry = while1.decl(zipEntryClass, "entry",JExpr.cast(zipEntryClass, varEntries.invoke("nextElement")));
 		while1._if(varEntry.invoke("getName").invoke("contains").arg("__MACOSX").cor(varEntry.invoke("getName").invoke("contains").arg(".DS_STORE")))._then()._continue();
 		JVar entryName = while1.decl(stringClass, "entryName", urlDecoderClass.boxify().staticInvoke("decode").arg(varEntry.invoke("getName")).arg("UTF-8"));
-		while1._if(entryName.invoke("endsWith").arg("*.kml"))._then()._continue();
+		while1._if(entryName.invoke("endsWith").arg("*.kml").not())._then()._continue();
 		JVar varIn = while1.decl(inputStreamClass, "in", varZip.invoke("getInputStream").arg(varEntry));
 		JVar varUnmarshal = while1.decl(kmlClass, "unmarshal", kmlClass.boxify().staticInvoke("unmarshal").arg(varIn));
 		while1.add(varKmlFiles.invoke("add").arg(varUnmarshal));
