@@ -10,8 +10,8 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
-import org.jvnet.jaxb2_commons.javaforkmlapi.ConvertComplexTypesToSimpleTypes;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
+import org.jvnet.jaxb2_commons.javaforkmlapi.primitives.ConvertComplexTypesToSimpleTypes;
 import org.xml.sax.ErrorHandler;
 
 import com.sun.codemodel.JCodeModel;

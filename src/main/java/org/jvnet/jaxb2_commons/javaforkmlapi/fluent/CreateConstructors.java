@@ -23,7 +23,7 @@ import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.Util;
 import org.jvnet.jaxb2_commons.javaforkmlapi.XJCJavaForKmlApiPlugin;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
-import org.jvnet.jaxb2_commons.javaforkmlapi.convenience.CreateIconClass;
+import org.jvnet.jaxb2_commons.javaforkmlapi.missingicon.CreateIconClass;
 import org.xml.sax.ErrorHandler;
 
 import com.sun.codemodel.JClass;

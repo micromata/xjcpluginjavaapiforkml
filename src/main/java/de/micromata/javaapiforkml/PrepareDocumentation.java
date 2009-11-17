@@ -19,9 +19,9 @@ import net.htmlparser.jericho.Tag;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.jvnet.jaxb2_commons.javaforkmlapi.addproperjavadoc.JaxbJavaDoc;
-import org.jvnet.jaxb2_commons.javaforkmlapi.addproperjavadoc.JaxbJavaDocElements;
-import org.jvnet.jaxb2_commons.javaforkmlapi.addproperjavadoc.AddProperJavaDocumentationForKML;
+import org.jvnet.jaxb2_commons.javaforkmlapi.documentation.AddProperJavaDocumentationForKML;
+import org.jvnet.jaxb2_commons.javaforkmlapi.documentation.JaxbJavaDoc;
+import org.jvnet.jaxb2_commons.javaforkmlapi.documentation.JaxbJavaDocElements;
 
 
 

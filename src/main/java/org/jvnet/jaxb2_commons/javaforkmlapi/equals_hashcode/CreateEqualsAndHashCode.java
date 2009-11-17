@@ -1,4 +1,4 @@
-package org.jvnet.jaxb2_commons.javaforkmlapi;
+package org.jvnet.jaxb2_commons.javaforkmlapi.equals_hashcode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
+import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;

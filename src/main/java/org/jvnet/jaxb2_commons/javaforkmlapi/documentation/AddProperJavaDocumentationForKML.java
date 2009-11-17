@@ -1,4 +1,4 @@
-package org.jvnet.jaxb2_commons.javaforkmlapi.addproperjavadoc;
+package org.jvnet.jaxb2_commons.javaforkmlapi.documentation;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,9 +7,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
-import org.jvnet.jaxb2_commons.javaforkmlapi.CreateEqualsAndHashCode;
 import org.jvnet.jaxb2_commons.javaforkmlapi.Util;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
+import org.jvnet.jaxb2_commons.javaforkmlapi.equals_hashcode.CreateEqualsAndHashCode;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 

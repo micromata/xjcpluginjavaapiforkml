@@ -13,7 +13,7 @@
 // $Date: $
 //
 // ///////////////////////////////////////////////////////////////////////////
-package org.jvnet.jaxb2_commons.javaforkmlapi.factory;
+package org.jvnet.jaxb2_commons.javaforkmlapi.kmlfactory;
 
 import java.util.ArrayList;
 import java.util.Collections;

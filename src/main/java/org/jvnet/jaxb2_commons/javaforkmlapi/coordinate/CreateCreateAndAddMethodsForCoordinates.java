@@ -1,4 +1,4 @@
-package org.jvnet.jaxb2_commons.javaforkmlapi.convenience;
+package org.jvnet.jaxb2_commons.javaforkmlapi.coordinate;
 
 import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlElement;

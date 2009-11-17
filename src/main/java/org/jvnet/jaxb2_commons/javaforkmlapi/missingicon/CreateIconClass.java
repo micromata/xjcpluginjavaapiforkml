@@ -13,7 +13,7 @@
 // $Date: $
 //
 // ///////////////////////////////////////////////////////////////////////////
-package org.jvnet.jaxb2_commons.javaforkmlapi.convenience;
+package org.jvnet.jaxb2_commons.javaforkmlapi.missingicon;
 
 import java.util.List;
 

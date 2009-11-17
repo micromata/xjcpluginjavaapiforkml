@@ -1,4 +1,4 @@
-package org.jvnet.jaxb2_commons.javaforkmlapi.addproperjavadoc;
+package org.jvnet.jaxb2_commons.javaforkmlapi.documentation;
 
 /**
  * represents a javadoc element, that could be added to a produced class by jaxb.

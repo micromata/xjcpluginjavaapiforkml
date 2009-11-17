@@ -1,4 +1,4 @@
-package org.jvnet.jaxb2_commons.javaforkmlapi.addproperjavadoc;
+package org.jvnet.jaxb2_commons.javaforkmlapi.documentation;
 
 import java.util.ArrayList;
 

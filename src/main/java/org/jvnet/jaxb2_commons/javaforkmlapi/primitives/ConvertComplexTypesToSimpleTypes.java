@@ -1,10 +1,11 @@
-package org.jvnet.jaxb2_commons.javaforkmlapi;
+package org.jvnet.jaxb2_commons.javaforkmlapi.primitives;
 
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElementRef;
 
 import org.apache.log4j.Logger;
+import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
 import org.xml.sax.ErrorHandler;
 
