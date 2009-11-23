@@ -1,19 +1,21 @@
 package org.jvnet.jaxb2_commons.javaforkmlapi;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+
 import com.sun.codemodel.ClassType;
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JExpr;
+import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
+import com.sun.codemodel.JOp;
 import com.sun.codemodel.JPackage;
+import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
-import com.sun.tools.xjc.model.CEnumLeafInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
-import com.sun.tools.xjc.outline.EnumOutline;
 import com.sun.tools.xjc.outline.Outline;
 import com.sun.tools.xjc.util.CodeModelClassFactory;
 
@@ -28,15 +30,17 @@ public class ClazzPool {
 
 	private JDefinedClass classLink;
 
+	private JDefinedClass classBooleanConverter;
+
 	public ClazzPool(Outline outline) {
 		JPackage kmlpackage = Util.getKmlClassPackage(outline);
 		CodeModelClassFactory classFactory = outline.getClassFactory();
 		JPackage ppp = outline.getCodeModel()._package(kmlpackage.getPackage().name() + ".annotations");
 		classObviousAnnotation = classFactory.createClass(ppp, JMod.PUBLIC, "Obvious", null, ClassType.ANNOTATION_TYPE_DECL);
 		classObviousAnnotation.annotate(Target.class).param("value", ElementType.FIELD).param("value", ElementType.METHOD);
-		classCoordinateConverter = classFactory
-		    .createClass(kmlpackage, JMod.PUBLIC | JMod.FINAL, "CoordinatesConverter", null, ClassType.CLASS);
-
+		classCoordinateConverter = classFactory.createClass(kmlpackage, JMod.PUBLIC | JMod.FINAL, "CoordinatesConverter", null, ClassType.CLASS);
+		classBooleanConverter = classFactory.createClass(kmlpackage, JMod.PUBLIC | JMod.FINAL, "BooleanConverter", null, ClassType.CLASS);
+		
 		for (final ClassOutline classOutline : outline.getClasses()) {
 			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 
@@ -62,6 +66,9 @@ public class ClazzPool {
 		}
 	}
 
+	
+
+	
 	public JDefinedClass getClassObviousAnnotation() {
 		return classObviousAnnotation;
 	}
@@ -81,5 +88,9 @@ public class ClazzPool {
 	public JDefinedClass getClassLink() {
 		return classLink;
 	}
+
+	public JDefinedClass getClassBooleanConverter() {
+	  return classBooleanConverter;
+  }
 
 }

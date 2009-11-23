@@ -494,7 +494,7 @@ public class CreateMarshalAndUnmarshal extends Command {
   }
 
 	private JDefinedClass createNestedPrefixCustomizer(ClassOutlineImpl cc) throws JClassAlreadyExistsException {
-		JDefinedClass namespacebeautyfier = cc.implClass._class(JMod.PRIVATE | JMod.FINAL, "NameSpaceBeautyfier");
+		JDefinedClass namespacebeautyfier = cc.implClass._class(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, "NameSpaceBeautyfier");
 		namespacebeautyfier._extends(NamespacePrefixMapper.class);
 
 		JMethod namespacebeautyfiergetpreferredprefix = namespacebeautyfier.method(JMod.PUBLIC, stringClass, "getPreferredPrefix");

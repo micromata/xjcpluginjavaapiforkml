@@ -10,6 +10,8 @@ import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.jvnet.jaxb2_commons.javaforkmlapi.booleanconverter.BooleanConverter;
+import org.jvnet.jaxb2_commons.javaforkmlapi.clone.CreateClone;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
 import org.jvnet.jaxb2_commons.javaforkmlapi.coordinate.CreateCoordinateClass;
 import org.jvnet.jaxb2_commons.javaforkmlapi.coordinate.CreateCreateAndAddMethodsForCoordinates;
@@ -21,6 +23,7 @@ import org.jvnet.jaxb2_commons.javaforkmlapi.kmlfactory.CreateOwnObjectFactory;
 import org.jvnet.jaxb2_commons.javaforkmlapi.marshal_unmarshal.CreateMarshalAndUnmarshal;
 import org.jvnet.jaxb2_commons.javaforkmlapi.missingicon.CreateIconClass;
 import org.jvnet.jaxb2_commons.javaforkmlapi.primitives.ConvertComplexTypesToSimpleTypes;
+import org.jvnet.jaxb2_commons.javaforkmlapi.tostring.CreateToString;
 import org.jvnet.jaxb2_commons.javaforkmlapi.xmlrootelement.JaxbPluginXmlRootElement;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.Locator;
@@ -260,6 +263,7 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 		mCommand.add(new CreateCoordinateClass(outline, opts, errorHandler, pool));
 		mCommand.add(new JaxbPluginXmlRootElement(outline, opts, errorHandler, pool));
 		mCommand.add(new ConvertComplexTypesToSimpleTypes(outline, opts, errorHandler, pool));
+		mCommand.add(new BooleanConverter(outline, opts, errorHandler, pool));
 		// // mCommand.add(new JaxbPluginXmlRootElement(outline, opts, errorHandler));
 		mCommand.add(new CreateEqualsAndHashCode(outline, opts, errorHandler, pool));
 		mCommand.add(new CreateConstructors(outline, opts, errorHandler, pool));
@@ -270,6 +274,7 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 		mCommand.add(new CreateCreateAndAddMethodsForCoordinates(outline, opts, errorHandler, pool));
 		// mCommand.add(new DefaultValuePlugin(outline, opts, errorHandler, pool));
 		mCommand.add(new AddProperJavaDocumentationForKML(outline, opts, errorHandler, pool));
+		mCommand.add(new CreateClone(outline, opts, errorHandler, pool));
 
 		for (Command command : mCommand) {
 			command.execute();

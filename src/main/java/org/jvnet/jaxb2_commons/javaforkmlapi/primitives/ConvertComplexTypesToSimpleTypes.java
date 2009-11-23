@@ -1,28 +1,21 @@
 package org.jvnet.jaxb2_commons.javaforkmlapi.primitives;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlElementRef;
-
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
 import org.xml.sax.ErrorHandler;
 
-import com.sun.codemodel.JClass;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
-import com.sun.codemodel.JPrimitiveType;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
 import com.sun.tools.xjc.outline.ClassOutline;
-import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
-import com.sun.tools.xjc.reader.TypeUtil;
+
 
 /**
  * 
@@ -51,7 +44,8 @@ public class ConvertComplexTypesToSimpleTypes extends Command {
 		}
 
 	}
-
+	
+	
 	private void convertComplexTypesToSimpleTypes(final ClassOutlineImpl cc) {
 		final JDefinedClass implClass = cc.implClass;
 		// if no fields are present return

@@ -19,6 +19,7 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
+import com.sun.codemodel.JOp;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
@@ -95,9 +96,9 @@ public class CreateCoordinateClass extends Command {
 		latitude = coordinateClass.fields().get("latitude");
 		altitude = coordinateClass.fields().get("altitude");
 
-		longitude.init(JExpr.lit(0.0d));
-		latitude.init(JExpr.lit(0.0d));
-		altitude.init(JExpr.lit(0.0d));
+//		longitude.init(JExpr.lit(0.0d));
+//		latitude.init(JExpr.lit(0.0d));
+//		altitude.init(JExpr.lit(0.0d));
 		// longitude = coordinateClass.field(JMod.PRIVATE, cm.DOUBLE, "longitu33de", JExpr.lit(0.0d));
 		// latitude = coordinateClass.field(JMod.PRIVATE, cm.DOUBLE, "latitud33e", JExpr.lit(0.0d));
 		// altitude = coordinateClass.field(JMod.PRIVATE, cm.DOUBLE, "altitud33e", JExpr.lit(0.0d));
@@ -156,6 +157,8 @@ public class CreateCoordinateClass extends Command {
 		// CreateEqualsAndHashCode.createHashCodeAndEqualsMethod(coordinateClass, null);
 
 	}
+	
+
 
 	private void createCoordinateClassConverter(Outline outline) {
 		// JPackage kmlpackage = Util.getKmlClassPackage(outline);
