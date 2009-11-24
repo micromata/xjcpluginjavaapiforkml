@@ -172,7 +172,12 @@ public class CreateClone extends Command {
 				clone.body().assign(copy.ref(jFieldVar),
 				    JExpr._new(arrayList.narrow(clazz)).arg(JExpr.direct("get" + Util.upperFirst(jFieldVar.name()) + "().size()")));
 				JForEach forEach = clone.body().forEach(clazz, "iter", jFieldVar);
-				forEach.body().add(copy.ref(jFieldVar).invoke("add").arg(forEach.var()));
+				if (forEach.var().type().fullName().equals("java.lang.Object")){
+					forEach.body().add(copy.ref(jFieldVar).invoke("add").arg(forEach.var()));
+				} else {
+					forEach.body().add(copy.ref(jFieldVar).invoke("add").arg(forEach.var().invoke("clone")));
+				}
+				
 
 				// clone.body().add(collections.boxify().staticInvoke("copy").arg(copy.ref(jFieldVar)).arg(jFieldVar));
 
