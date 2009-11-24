@@ -91,19 +91,12 @@ public class CreateClone extends Command {
 	}
 
 	public void createToString(final JDefinedClass implClass, final ClassOutline classOutline) {
-		// if no fields are present return
-		if (implClass.fields().isEmpty()) {
-			return;
-		}
+
 		JClass extends1 = implClass._extends();
 
 		implClass._implements(Cloneable.class);
 		Collection<JFieldVar> fields = Util.getAllFieldsFields(classOutline, false);
 
-		// generate only if suitable fields exist
-		if (fields.size() == 0) {
-			return;
-		}
 		LOG.info("generate clone fields#: " + implClass.name() + " (" + fields.size() + ") " + extends1.fullName());
 
 		// generate hashCode() and equals()-method
@@ -172,10 +165,12 @@ public class CreateClone extends Command {
 				clone.body().assign(copy.ref(jFieldVar),
 				    JExpr._new(arrayList.narrow(clazz)).arg(JExpr.direct("get" + Util.upperFirst(jFieldVar.name()) + "().size()")));
 				JForEach forEach = clone.body().forEach(clazz, "iter", jFieldVar);
-				if (forEach.var().type().fullName().equals("java.lang.Object")){
+				if (forEach.var().type().fullName().equals("java.lang.Object") || enums.contains(forEach.var().type().fullName()) || forEach.var().type().fullName().equals("java.lang.String") ){
 					forEach.body().add(copy.ref(jFieldVar).invoke("add").arg(forEach.var()));
+					System.out.println("444a>>>>>>>" + forEach.var().type().fullName());
 				} else {
 					forEach.body().add(copy.ref(jFieldVar).invoke("add").arg(forEach.var().invoke("clone")));
+					System.out.println("444b>>>>>>>" + forEach.var().type().fullName()+".clone()");
 				}
 				
 
