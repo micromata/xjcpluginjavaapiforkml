@@ -106,13 +106,13 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 			}
 		}
 		
-		for (final CClassInfo classInfo : model.beans().values()) {
-			LOG.info("++++++ " + classInfo.fullName());
-			for (CPropertyInfo p : classInfo.getProperties()) {
-				String fullName = p.baseType.fullName();
-				LOG.info("++++++ " + fullName);
-      }
-		}
+//		for (final CClassInfo classInfo : model.beans().values()) {
+//			LOG.info("++++++ " + classInfo.fullName());
+//			for (CPropertyInfo p : classInfo.getProperties()) {
+//				String fullName = p.baseType.fullName();
+//				LOG.info("++++++ " + fullName);
+//      }
+//		}
 //		
 //		for (CClassInfo classInfo : model.beans().values()) {
 //			if (classInfo.fullName().equals(PACKAGE_GX + ".Playlist")) {
@@ -262,7 +262,6 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 		mCommand.add(new CreateOwnObjectFactory(outline, opts, errorHandler, pool));
 		mCommand.add(new CreateMarshalAndUnmarshal(outline, opts, errorHandler, pool));
 		mCommand.add(new CreateCreateAndAddMethodsForCoordinates(outline, opts, errorHandler, pool));
-		// mCommand.add(new DefaultValuePlugin(outline, opts, errorHandler, pool));
 		mCommand.add(new AddProperJavaDocumentationForKML(outline, opts, errorHandler, pool));
 		mCommand.add(new CreateClone(outline, opts, errorHandler, pool));
 
