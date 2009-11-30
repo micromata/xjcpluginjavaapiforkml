@@ -9,16 +9,13 @@ import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.Util;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
-import org.jvnet.jaxb2_commons.javaforkmlapi.equals_hashcode.CreateEqualsAndHashCode;
 import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
 
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
-import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
@@ -42,7 +39,7 @@ import de.micromata.javaapiforkml.JaxbTool;
 public class AddProperJavaDocumentationForKML extends Command {
 	private static final Logger LOG = Logger.getLogger(AddProperJavaDocumentationForKML.class.getName());
 
-	public AddProperJavaDocumentationForKML(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public AddProperJavaDocumentationForKML(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 
 	}
@@ -52,8 +49,8 @@ public class AddProperJavaDocumentationForKML extends Command {
 
 	@Override
 	public void execute() {
-		HashMap<String, ClassOutlineImpl> classList = Util.getClassList(outline);
-		HashMap<String, ArrayList<CClassInfo>> subclasses = Util.findSubClasses(outline);
+		final HashMap<String, ClassOutlineImpl> classList = Util.getClassList(outline);
+		final HashMap<String, ArrayList<CClassInfo>> subclasses = Util.findSubClasses(outline);
 
 		HashMap<String, JaxbJavaDoc> kmlJavaDocElements = null;
 		kmlJavaDocElements = getObjectsFromXmlWithJaxb(LOADJAVADOCSFROMFILE);
@@ -65,7 +62,7 @@ public class AddProperJavaDocumentationForKML extends Command {
 
 		LOG.info("trying to add javadocs to found enums:");
 		for (final EnumOutline classOutline : outline.getEnums()) {
-			JDefinedClass implClass = classOutline.clazz;
+			final JDefinedClass implClass = classOutline.clazz;
 			String namewithoutType = implClass.name().toLowerCase().trim();
 
 			namewithoutType = eliminateTypeSuffix(namewithoutType);
@@ -78,7 +75,7 @@ public class AddProperJavaDocumentationForKML extends Command {
 				namewithoutType = "listitemtype";
 			}
 
-			JaxbJavaDoc kmlJavaDocElement = kmlJavaDocElements.get(namewithoutType);
+			final JaxbJavaDoc kmlJavaDocElement = kmlJavaDocElements.get(namewithoutType);
 			if (kmlJavaDocElement == null) {
 				LOG.info("- E> " + implClass.name());
 				continue;
@@ -91,10 +88,10 @@ public class AddProperJavaDocumentationForKML extends Command {
 
 		LOG.info("trying to add javadocs to found classes:");
 		for (final ClassOutline classOutline : outline.getClasses()) {
-			JDefinedClass implClass = classOutline.implClass;
+			final JDefinedClass implClass = classOutline.implClass;
 			String namewithoutType = classOutline.implClass.name().toLowerCase().trim();
 			namewithoutType = eliminateTypeSuffix(namewithoutType);
-			JaxbJavaDoc kmlJavaDocElement = kmlJavaDocElements.get(namewithoutType);
+			final JaxbJavaDoc kmlJavaDocElement = kmlJavaDocElements.get(namewithoutType);
 			if (kmlJavaDocElement == null) {
 				// LOG.info("- C> " + classOutline.implClass.name());
 				continue;
@@ -111,7 +108,7 @@ public class AddProperJavaDocumentationForKML extends Command {
 
 					final JCodeModel codeModel = classOutline.parent().getCodeModel();
 
-					JFieldVar currentField = implClass.fields().get(property.getName(false));
+					final JFieldVar currentField = implClass.fields().get(property.getName(false));
 
 					// LOG.info("fieldType: " + currentField.name());
 					// find the common type
@@ -123,7 +120,7 @@ public class AddProperJavaDocumentationForKML extends Command {
 						continue;
 					}
 					currentFieldTypeName = eliminateTypeSuffix(currentFieldTypeName);
-					JaxbJavaDoc javadocForCurrentFieldName = kmlJavaDocElements.get(property.getName(false).trim().toLowerCase());
+					final JaxbJavaDoc javadocForCurrentFieldName = kmlJavaDocElements.get(property.getName(false).trim().toLowerCase());
 					if (javadocForCurrentFieldName != null) {
 						// LOG.info("++C> " + currentFieldTypeName + " " + property.getName(false));
 						currentField.javadoc().clear();
@@ -131,7 +128,7 @@ public class AddProperJavaDocumentationForKML extends Command {
 						continue;
 					}
 
-					JaxbJavaDoc javadocForCurrentField = kmlJavaDocElements.get(currentFieldTypeName);
+					final JaxbJavaDoc javadocForCurrentField = kmlJavaDocElements.get(currentFieldTypeName);
 					if (javadocForCurrentField != null) {
 						// LOG.info("+  > " + currentFieldTypeName + " " + property.getName(false));
 						currentField.javadoc().clear();
@@ -160,7 +157,7 @@ public class AddProperJavaDocumentationForKML extends Command {
 				}
 				// LOG.info("--!> " + classOutline.implClass.name() + " !>" + jmethod.name());
 				if (jmethod.name().startsWith("get") || jmethod.name().startsWith("set")) {
-					String subSequence = jmethod.name().substring(3, jmethod.name().length());
+					final String subSequence = jmethod.name().substring(3, jmethod.name().length());
 					// if (classOutline.implRef._package().name())
 					//				
 				
@@ -201,7 +198,7 @@ public class AddProperJavaDocumentationForKML extends Command {
 		return r;
 	}
 
-	private HashMap<String, JaxbJavaDoc> getObjectsFromXmlWithJaxb(String loadJavaDocsFromFile) {
+	private HashMap<String, JaxbJavaDoc> getObjectsFromXmlWithJaxb(final String loadJavaDocsFromFile) {
 		HashMap<String, JaxbJavaDoc> javaDocElements = null;
 		JaxbTool<JaxbJavaDocElements> jaxt;
 		JaxbJavaDocElements unmarshalledElements = null;
@@ -224,9 +221,9 @@ public class AddProperJavaDocumentationForKML extends Command {
 	 * 
 	 * @return the newly created HashMap
 	 */
-	private static HashMap<String, JaxbJavaDoc> convertArrayListToHashMap(List<JaxbJavaDoc> arraylist) {
-		HashMap<String, JaxbJavaDoc> hashmap = new HashMap<String, JaxbJavaDoc>();
-		for (JaxbJavaDoc jaxbJavaDoc : arraylist) {
+	private static HashMap<String, JaxbJavaDoc> convertArrayListToHashMap(final List<JaxbJavaDoc> arraylist) {
+		final HashMap<String, JaxbJavaDoc> hashmap = new HashMap<String, JaxbJavaDoc>();
+		for (final JaxbJavaDoc jaxbJavaDoc : arraylist) {
 			hashmap.put(jaxbJavaDoc.getClassName(), jaxbJavaDoc);
 		}
 		return hashmap;

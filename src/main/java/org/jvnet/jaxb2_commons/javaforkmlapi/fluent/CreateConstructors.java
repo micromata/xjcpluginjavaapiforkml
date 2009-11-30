@@ -23,13 +23,10 @@ import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.Util;
 import org.jvnet.jaxb2_commons.javaforkmlapi.XJCJavaForKmlApiPlugin;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
-import org.jvnet.jaxb2_commons.javaforkmlapi.missingicon.CreateIconClass;
 import org.xml.sax.ErrorHandler;
 
-import com.sun.codemodel.JClass;
 import com.sun.codemodel.JExpr;
 import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JVar;
@@ -42,7 +39,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class CreateConstructors extends Command {
 	private static final Logger LOG = Logger.getLogger(CreateConstructors.class.getName());
 
-	public CreateConstructors(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public CreateConstructors(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 	}
 
@@ -50,12 +47,12 @@ public class CreateConstructors extends Command {
 	public void execute() {
 		LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " generate Overloaded Constructors for required fields.");
 		for (final ClassOutline classOutline : outline.getClasses()) {
-			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
+			final ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 			if (cc.implClass.name().equals("Coordinate")) {
 				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " skip Coordinate standard constructors and create custom ones");
 				continue;
 			}
-			Collection<JFieldVar> requiredConstructorFields = Util.getConstructorRequiredFields(cc);
+			final Collection<JFieldVar> requiredConstructorFields = Util.getConstructorRequiredFields(cc);
 			int mods = JMod.PUBLIC;
 			if (requiredConstructorFields.size() > 0) {
 				createArgConstructor(cc, requiredConstructorFields);
@@ -67,7 +64,7 @@ public class CreateConstructors extends Command {
 		}
 	}
 
-	private void createNoArgConstructor(final ClassOutline classOutline, int mods) {
+	private void createNoArgConstructor(final ClassOutline classOutline, final int mods) {
 		// Create the default, no-arg constructor
 		final JMethod defaultConstructor = classOutline.implClass.constructor(mods);
 		if (mods == JMod.PRIVATE) {
@@ -78,31 +75,31 @@ public class CreateConstructors extends Command {
 		defaultConstructor.body().invoke("super");
 	}
 
-	private void createArgConstructor(ClassOutlineImpl cc, Collection<JFieldVar> required) {
-		StringBuffer debugOut = new StringBuffer();
-		Map<String, FieldOutline> fieldOutlineasMap = Util.getRequiredFieldsAsMap(cc);
+	private void createArgConstructor(final ClassOutlineImpl cc, final Collection<JFieldVar> required) {
+		final StringBuffer debugOut = new StringBuffer();
+		final Map<String, FieldOutline> fieldOutlineasMap = Util.getRequiredFieldsAsMap(cc);
 
 		final JMethod defaultConstructor = cc.implClass.constructor(JMod.PUBLIC);
 		defaultConstructor.javadoc().add("Value constructor with only mandatory fields");
 		defaultConstructor.body().invoke("super");
 
-		for (JFieldVar field : required) {
+		for (final JFieldVar field : required) {
 			// FieldOutline fo = fieldOutlineasMap.get(field.name());
 			// if (fo == null) {
 			// continue;
 			// }
 			// if (fo.getPropertyInfo().isCollection()) {
-			// System.out.println("!!!!! " + cc.implClass.name() + " is collection " + field.name() );
+			// LOG.info("!!!!! " + cc.implClass.name() + " is collection " + field.name() );
 			// continue;
 			// }
 
-			final JVar arg = defaultConstructor.param(JMod.FINAL, field.type(), field.name());
+			final JVar arg = defaultConstructor.param(JMod.FINAL, Util.removeJAXBElement(cm, field.type()), field.name());
 			defaultConstructor.javadoc().addParam(arg).append("required parameter");
 			defaultConstructor.body().assign(JExpr.refthis(field.name()), arg);
 		}
 
 		debugOut.append("c> " + cc.implRef.name() + " :: public " + cc.target.shortName + "(");
-		for (JFieldVar field : required) {
+		for (final JFieldVar field : required) {
 			debugOut.append(field.type().name() + ", ");
 		}
 		if (required.size() > 0) {

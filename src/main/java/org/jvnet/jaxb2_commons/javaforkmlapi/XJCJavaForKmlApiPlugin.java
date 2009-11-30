@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.activation.MimeType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
 
 import org.apache.log4j.Logger;
@@ -23,40 +21,24 @@ import org.jvnet.jaxb2_commons.javaforkmlapi.kmlfactory.CreateOwnObjectFactory;
 import org.jvnet.jaxb2_commons.javaforkmlapi.marshal_unmarshal.CreateMarshalAndUnmarshal;
 import org.jvnet.jaxb2_commons.javaforkmlapi.missingicon.CreateIconClass;
 import org.jvnet.jaxb2_commons.javaforkmlapi.primitives.ConvertComplexTypesToSimpleTypes;
-import org.jvnet.jaxb2_commons.javaforkmlapi.tostring.CreateToString;
 import org.jvnet.jaxb2_commons.javaforkmlapi.xmlrootelement.JaxbPluginXmlRootElement;
 import org.xml.sax.ErrorHandler;
-import org.xml.sax.Locator;
 
 import com.sun.codemodel.JPackage;
-import com.sun.codemodel.JType;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
-import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
 import com.sun.tools.xjc.model.CAttributePropertyInfo;
 import com.sun.tools.xjc.model.CBuiltinLeafInfo;
 import com.sun.tools.xjc.model.CClassInfo;
 import com.sun.tools.xjc.model.CClassInfoParent;
 import com.sun.tools.xjc.model.CCustomizations;
-import com.sun.tools.xjc.model.CElementPropertyInfo;
 import com.sun.tools.xjc.model.CEnumConstant;
 import com.sun.tools.xjc.model.CEnumLeafInfo;
-import com.sun.tools.xjc.model.CPluginCustomization;
 import com.sun.tools.xjc.model.CPropertyInfo;
-import com.sun.tools.xjc.model.CTypeRef;
-import com.sun.tools.xjc.model.CValuePropertyInfo;
 import com.sun.tools.xjc.model.Model;
-import com.sun.tools.xjc.model.CElementPropertyInfo.CollectionMode;
-import com.sun.tools.xjc.model.nav.NType;
-import com.sun.tools.xjc.outline.Aspect;
 import com.sun.tools.xjc.outline.Outline;
-import com.sun.xml.bind.v2.model.core.ID;
-import com.sun.xml.xsom.XSComponent;
 import com.sun.xml.xsom.XSSchema;
-import com.sun.xml.xsom.XmlString;
-import com.sun.tools.xjc.outline.Aspect;
-import com.sun.tools.xjc.reader.RawTypeSet.Ref;
 
 /**
  * {@link Plugin} that always removes the Type-Suffix (if present) from generated classes.
@@ -88,16 +70,16 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 
 	public final static String PACKAGE_XAL = PACKAGE_KML + ".xal";
 
-	private List<Command> mCommand = new ArrayList<Command>();
+	private final List<Command> mCommand = new ArrayList<Command>();
 
 	@Override
-	public void postProcessModel(Model model, ErrorHandler errorHandler) {
+	public void postProcessModel(final Model model, final ErrorHandler errorHandler) {
 		JPackage mainPackage = null;
 		CClassInfo classLink = null;
 		CEnumLeafInfo altitudeModeKML = null;
 		CEnumLeafInfo altitudeModeGX = null;
 
-		for (CClassInfo classInfo : model.beans().values()) {
+		for (final CClassInfo classInfo : model.beans().values()) {
 			if (classInfo.shortName.equals("Kml")) {
 				LOG.info("Found KML package: " + classInfo.getOwnerPackage().name());
 				mainPackage = classInfo.getOwnerPackage();
@@ -105,7 +87,7 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 			}
 		}
 
-		for (CClassInfo classInfo : model.beans().values()) {
+		for (final CClassInfo classInfo : model.beans().values()) {
 			if (classInfo.shortName.equals("Link") && classInfo.getOwnerPackage().name().equals(mainPackage.name())) {
 				classLink = classInfo;
 //				for (iterable_type iterable_element : classLink.getProperties()) {
@@ -116,12 +98,20 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 			}
 		}
 		
-		for (CClassInfo classInfo : model.beans().values()) {
+		for (final CClassInfo classInfo : model.beans().values()) {
 			if (classInfo.fullName().equals(PACKAGE_GX + ".TourPrimitive") && !classInfo.isAbstract()) {
 				classInfo.setAbstract();
 				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " Found gxTourPrimtive class, set abstract!");
 				break;
 			}
+		}
+		
+		for (final CClassInfo classInfo : model.beans().values()) {
+			LOG.info("++++++ " + classInfo.fullName());
+			for (CPropertyInfo p : classInfo.getProperties()) {
+				String fullName = p.baseType.fullName();
+				LOG.info("++++++ " + fullName);
+      }
 		}
 //		
 //		for (CClassInfo classInfo : model.beans().values()) {
@@ -135,7 +125,7 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 //			}
 //		}
 
-		for (CEnumLeafInfo classInfo : model.enums().values()) {
+		for (final CEnumLeafInfo classInfo : model.enums().values()) {
 			if (classInfo.fullName().equals(PACKAGE_KML + ".AltitudeMode")) {
 				altitudeModeKML = classInfo;
 				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " Found AltitudeMode in KML package");
@@ -153,51 +143,51 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 		assert classLink != null;
 		assert altitudeModeKML != null;
 		assert altitudeModeGX != null;
-		CBuiltinLeafInfo doubleValue = CBuiltinLeafInfo.DOUBLE;
+		final CBuiltinLeafInfo doubleValue = CBuiltinLeafInfo.DOUBLE;
 
-		XSSchema schema = model.schemaComponent.getSchema("http://www.opengis.net/kml/2.2");
+		final XSSchema schema = model.schemaComponent.getSchema("http://www.opengis.net/kml/2.2");
 
 		LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " -------Icon properties ------------------");
-		CClassInfoParent cClassInfoParentLink = classLink.parent();
+		final CClassInfoParent cClassInfoParentLink = classLink.parent();
 
-		CClassInfo iconClass = new CClassInfo(model, cClassInfoParentLink, "Icon", null, new QName("Icon"), null, schema, new CCustomizations());
+		final CClassInfo iconClass = new CClassInfo(model, cClassInfoParentLink, "Icon", null, new QName("Icon"), null, schema, new CCustomizations());
 		iconClass.setBaseClass(classLink.getBaseClass());
 
 		//fill icon class with the properties defined in link class
-		List<CPropertyInfo> properties = classLink.getProperties();
-		for (CPropertyInfo c : properties) {
+		final List<CPropertyInfo> properties = classLink.getProperties();
+		for (final CPropertyInfo c : properties) {
 			iconClass.addProperty(c);
 		}
 		
-		Collection<CEnumConstant> constants = altitudeModeGX.getConstants();
-		for (CEnumConstant cEnumConstant : constants) {
+		final Collection<CEnumConstant> constants = altitudeModeGX.getConstants();
+		for (final CEnumConstant cEnumConstant : constants) {
 			altitudeModeKML.members.add( new CEnumConstant(cEnumConstant.getName(), null, cEnumConstant.getLexicalValue(), null, null, null));
     }
 		
 		//model.enums().remove(altitudeModeGX.fullName());
 		
 //		altitudeModeKML.javadoc
-		Collection<CEnumConstant> constantsKML = altitudeModeKML.getConstants();
-		for (CEnumConstant cEnumConstant : constantsKML) {
+		final Collection<CEnumConstant> constantsKML = altitudeModeKML.getConstants();
+		for (final CEnumConstant cEnumConstant : constantsKML) {
 			LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " altitudeMode property: " + cEnumConstant.getLexicalValue());
     }
 		
 //		altitudeModeGX.parent.getOwnerPackage().remove(altitudeModeGX.);
 		
 		
-		QName qNameCoordinate = new QName("http://www.opengis.net/kml/2.2", "Coordinate");
-		QName qNameLongitude = new QName("PerlPleaseRemoveMeLongitude");
-		QName qNameLatitude = new QName("PerlPleaseRemoveMeLatitude");
-		QName qNameAltitude = new QName("PerlPleaseRemoveMeAltitude");
-		CClassInfo cc4 = new CClassInfo(model, cClassInfoParentLink, "Coordinate", null, qNameCoordinate, null, schema, new CCustomizations());
+		final QName qNameCoordinate = new QName("http://www.opengis.net/kml/2.2", "Coordinate");
+		final QName qNameLongitude = new QName("PerlPleaseRemoveMeLongitude");
+		final QName qNameLatitude = new QName("PerlPleaseRemoveMeLatitude");
+		final QName qNameAltitude = new QName("PerlPleaseRemoveMeAltitude");
+		final CClassInfo cc4 = new CClassInfo(model, cClassInfoParentLink, "Coordinate", null, qNameCoordinate, null, schema, new CCustomizations());
 
 		//LOG.info(":::::::::::::::::::::::::::::::::: " + doubleValue.getType().fullName());
 
-		CAttributePropertyInfo cAttributeLongitude = new CAttributePropertyInfo("longitude", null, new CCustomizations(), null, qNameLongitude,
+		final CAttributePropertyInfo cAttributeLongitude = new CAttributePropertyInfo("longitude", null, new CCustomizations(), null, qNameLongitude,
 		    doubleValue, null, false);
-		CAttributePropertyInfo cAttributeLatitude = new CAttributePropertyInfo("latitude", null, null, null, qNameLatitude, doubleValue, null,
+		final CAttributePropertyInfo cAttributeLatitude = new CAttributePropertyInfo("latitude", null, null, null, qNameLatitude, doubleValue, null,
 		    false);
-		CAttributePropertyInfo cAttributeAltitude = new CAttributePropertyInfo("altitude", null, new CCustomizations(), null, qNameAltitude,
+		final CAttributePropertyInfo cAttributeAltitude = new CAttributePropertyInfo("altitude", null, new CCustomizations(), null, qNameAltitude,
 		    doubleValue, null, false);
 
 		cc4.addProperty(cAttributeLongitude);
@@ -234,7 +224,7 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 	 * @throws com.sun.tools.xjc.BadCommandLineException if the plugin is invoked with wrong parameters
 	 */
 	@Override
-	public void onActivated(Options opts) throws BadCommandLineException {
+	public void onActivated(final Options opts) throws BadCommandLineException {
 
 		PropertyConfigurator.configure(LOG4J_LOCATION);
 		LOG
@@ -252,10 +242,10 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 	 *         return false.
 	 */
 	@Override
-	public boolean run(Outline outline, Options opts, ErrorHandler errorHandler) {
+	public boolean run(final Outline outline, final Options opts, final ErrorHandler errorHandler) {
 		opts.noFileHeader = true;
 
-		ClazzPool pool = new ClazzPool(outline);
+		final ClazzPool pool = new ClazzPool(outline);
 
 		// mCommand.add(new CreateAnnotationClasses(outline, opts, errorHandler, this));
 		mCommand.add(new CleanCode(outline, opts, errorHandler, pool));
@@ -276,7 +266,7 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 		mCommand.add(new AddProperJavaDocumentationForKML(outline, opts, errorHandler, pool));
 		mCommand.add(new CreateClone(outline, opts, errorHandler, pool));
 
-		for (Command command : mCommand) {
+		for (final Command command : mCommand) {
 			command.execute();
 		}
 

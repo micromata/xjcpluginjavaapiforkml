@@ -1,14 +1,11 @@
 package org.jvnet.jaxb2_commons.javaforkmlapi.command;
 
-import java.util.HashMap;
-
-import com.sun.codemodel.JDefinedClass;
-import com.sun.tools.xjc.outline.Outline;
-
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
-import org.jvnet.jaxb2_commons.javaforkmlapi.XJCJavaForKmlApiPlugin;
 import org.xml.sax.ErrorHandler;
+
+import com.sun.codemodel.JCodeModel;
 import com.sun.tools.xjc.Options;
+import com.sun.tools.xjc.outline.Outline;
 
 public abstract class Command {
 
@@ -20,6 +17,8 @@ public abstract class Command {
 
 	protected ClazzPool pool;
 
+	protected JCodeModel cm;
+
 	@SuppressWarnings("unused")
 	private Command() {
 	}
@@ -30,11 +29,12 @@ public abstract class Command {
   }
 
 
-	public Command(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public Command(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		this.outline = outline;
 		this.opts = opts;
 		this.errorHandler = errorHandler;
 		this.pool = pool;
+		this.cm = outline.getCodeModel();
 	}
 
 	public abstract void execute();
@@ -50,4 +50,9 @@ public abstract class Command {
 	public ErrorHandler getErrorHandler() {
 		return errorHandler;
 	}
+
+
+	public JCodeModel getCm() {
+	  return cm;
+  }
 }

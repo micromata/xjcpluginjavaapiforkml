@@ -15,11 +15,11 @@ public class JaxbJavaDocElements {
 		this.elements = new ArrayList<JaxbJavaDoc>();
 	}
 
-	public JaxbJavaDocElements(ArrayList<JaxbJavaDoc> javadocElements) {
+	public JaxbJavaDocElements(final ArrayList<JaxbJavaDoc> javadocElements) {
 		this.elements = javadocElements;
 	}
 
-	public void setElements(ArrayList<JaxbJavaDoc> element) {
+	public void setElements(final ArrayList<JaxbJavaDoc> element) {
 		this.elements = element;
 	}
 

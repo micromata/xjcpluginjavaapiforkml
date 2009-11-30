@@ -37,7 +37,7 @@ public final class JaxbTool<T>
 
   private Unmarshaller u = null;
 
-  private Class<T> declaredType;
+  private final Class<T> declaredType;
 
   public JAXBContext getJaxbContext() throws JAXBException
   {
@@ -69,7 +69,7 @@ public final class JaxbTool<T>
    * @param contextPath
    * @throws JAXBException
    */
-  public JaxbTool(Class<T> clazz)
+  public JaxbTool(final Class<T> clazz)
   {
     this.declaredType = clazz;
   }
@@ -82,40 +82,40 @@ public final class JaxbTool<T>
    * @throws JAXBException
    * @throws FileNotFoundException
    */
-  public void marshal(T plainRootObject, OutputStream outputStream) throws FileNotFoundException
+  public void marshal(final T plainRootObject, final OutputStream outputStream) throws FileNotFoundException
   {
     try {
-      JAXBElement<T> jaxbRootElement = prepareJaxbElement(plainRootObject);
+      final JAXBElement<T> jaxbRootElement = prepareJaxbElement(plainRootObject);
       m = prepareMarshaller();
       m.marshal(jaxbRootElement, outputStream);
-    } catch (JAXBException _x) {
+    } catch (final JAXBException _x) {
       _x.printStackTrace();
     }
   }
 
-  public void marshal(T plainRootObject, File output)
+  public void marshal(final T plainRootObject, final File output)
   {
     try {
-      JAXBElement<T> jaxbRootElement = prepareJaxbElement(plainRootObject);
+      final JAXBElement<T> jaxbRootElement = prepareJaxbElement(plainRootObject);
       m = prepareMarshaller();
       m.marshal(jaxbRootElement, output);
-    } catch (JAXBException _x) {
+    } catch (final JAXBException _x) {
       _x.printStackTrace();
     }
   }
 
-  public void marshal(T plainRootObject, java.io.Writer writer)
+  public void marshal(final T plainRootObject, final java.io.Writer writer)
   {
     try {
-      JAXBElement<T> jaxbRootElement = prepareJaxbElement(plainRootObject);
+      final JAXBElement<T> jaxbRootElement = prepareJaxbElement(plainRootObject);
       m = prepareMarshaller();
       m.marshal(jaxbRootElement, writer);
-    } catch (JAXBException _x) {
+    } catch (final JAXBException _x) {
       _x.printStackTrace();
     }
   }
 
-  private JAXBElement<T> prepareJaxbElement(T plainRootObject)
+  private JAXBElement<T> prepareJaxbElement(final T plainRootObject)
   {
     String name = plainRootObject.getClass().getSimpleName();
     if ("Kml".equals(name)) {
@@ -126,7 +126,7 @@ public final class JaxbTool<T>
     // due to the fact, that declaredType.getSimpleName().toLowerCase() could return kmltype
     // find a better solution. perhaps move to api and give each major kml-element the power
     // to marshal and unmarshall by itself
-    JAXBElement<T> jaxbRootElement = new JAXBElement<T>(new QName("http://www.opengis.net/kml/2.2", name), declaredType, plainRootObject);
+    final JAXBElement<T> jaxbRootElement = new JAXBElement<T>(new QName("http://www.opengis.net/kml/2.2", name), declaredType, plainRootObject);
     return jaxbRootElement;
   }
 
@@ -146,75 +146,75 @@ public final class JaxbTool<T>
    * @param <T>
    * @throws JAXBException
    */
-  public T unmarshal(File file)
+  public T unmarshal(final File file)
   {
     try {
       u = this.getUnmarshaller();
-      JAXBElement<T> jaxbRootElement = u.unmarshal(new StreamSource(file), declaredType);
+      final JAXBElement<T> jaxbRootElement = u.unmarshal(new StreamSource(file), declaredType);
       return jaxbRootElement.getValue();
  
 //      return u.unmarshal(new StreamSource(file), declaredType).getValue();
-    } catch (JAXBException _x) {
+    } catch (final JAXBException _x) {
       _x.printStackTrace();
     }
 
     return null;
   }
 
-  public T unmarshal(InputStream is)
+  public T unmarshal(final InputStream is)
   {
     try {
       u = this.getUnmarshaller();
-      JAXBElement<T> jaxbRootElement = u.unmarshal(new StreamSource(is), declaredType);
+      final JAXBElement<T> jaxbRootElement = u.unmarshal(new StreamSource(is), declaredType);
       return jaxbRootElement.getValue();
  
 //      return u.unmarshal(new StreamSource(file), declaredType).getValue();
-    } catch (JAXBException _x) {
+    } catch (final JAXBException _x) {
       _x.printStackTrace();
     }
 
     return null;
   }
 
-  public T unmarshal(Reader reader)
+  public T unmarshal(final Reader reader)
   {
     try {
       u = this.getUnmarshaller();
-      JAXBElement<T> jaxbRootElement = u.unmarshal(new StreamSource(reader), declaredType);
+      final JAXBElement<T> jaxbRootElement = u.unmarshal(new StreamSource(reader), declaredType);
       return jaxbRootElement.getValue();
  
 //      return u.unmarshal(new StreamSource(file), declaredType).getValue();
-    } catch (JAXBException _x) {
+    } catch (final JAXBException _x) {
       _x.printStackTrace();
     }
 
     return null;
  }
 
-  public T unmarshal(URL url)
+  public T unmarshal(final URL url)
   {
     try {
       u = this.getUnmarshaller();
-      JAXBElement<T> jaxbRootElement = u.unmarshal(new StreamSource(url.toExternalForm()), declaredType);
+      final JAXBElement<T> jaxbRootElement = u.unmarshal(new StreamSource(url.toExternalForm()), declaredType);
       return jaxbRootElement.getValue();
  
 //      return u.unmarshal(new StreamSource(file), declaredType).getValue();
-    } catch (JAXBException _x) {
+    } catch (final JAXBException _x) {
       _x.printStackTrace();
     }
 
     return null;
  }
 
-  public T unmarshal(Source source)
+  public T unmarshal(final Source source)
   {
     try {
       u = this.getUnmarshaller();
-      JAXBElement<T> jaxbRootElement = u.unmarshal(source, declaredType);
+      final JAXBElement<T> jaxbRootElement = u.unmarshal(source, declaredType);
       return jaxbRootElement.getValue();
  
 //      return u.unmarshal(new StreamSource(file), declaredType).getValue();
-    } catch (JAXBException _x) {
+    } catch (final JAXBException _x) {
       _x.printStackTrace();
     }
 
@@ -226,28 +226,28 @@ public final class JaxbTool<T>
     try {
       u = this.getUnmarshaller();
 
-      SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      File schemaFile = new File(schemaValidationFile);
-      Schema schema = sf.newSchema(schemaFile);
+      final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+      final File schemaFile = new File(schemaValidationFile);
+      final Schema schema = sf.newSchema(schemaFile);
       u.setSchema(schema);
       return true;
-    } catch (JAXBException e) {
+    } catch (final JAXBException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
-    } catch (SAXException _x) {
+    } catch (final SAXException _x) {
       _x.printStackTrace();
     }
     return false;
   }
 
-  public void generateSchema(String schemaName) throws IOException
+  public void generateSchema(final String schemaName) throws IOException
   {
-    SystemOutSchemaOutput sysout = new SystemOutSchemaOutput();
+    final SystemOutSchemaOutput sysout = new SystemOutSchemaOutput();
     try {
       this.getJaxbContext().generateSchema(sysout);
       sysout.saveToFile(schemaName);
       LOG.info("--------------");
-    } catch (JAXBException _x) {
+    } catch (final JAXBException _x) {
       _x.printStackTrace();
     }
 
@@ -258,7 +258,7 @@ public final class JaxbTool<T>
     return schemaValidationFile;
   }
 
-  public void setSchemaValidationFile(String schemaValidationFile)
+  public void setSchemaValidationFile(final String schemaValidationFile)
   {
     this.schemaValidationFile = schemaValidationFile;
   }

@@ -1,30 +1,26 @@
 package org.jvnet.jaxb2_commons.javaforkmlapi.tostring;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
-import javax.xml.validation.SchemaFactory;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
 import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
 
-import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JExpression;
-import com.sun.codemodel.JFieldRef;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
-import com.sun.codemodel.JOp;
-import com.sun.codemodel.JPackage;
-import com.sun.codemodel.JType;
-import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
@@ -34,7 +30,6 @@ import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.model.CReferencePropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
-import com.sun.xml.xsom.XSAnnotation;
 
 /**
  * {@link Plugin} This plugin modifies XJC's code generation behavior so that you get an equals() and a hashCode()-method in each genereated
@@ -45,7 +40,7 @@ import com.sun.xml.xsom.XSAnnotation;
 public class CreateToString extends Command {
 	private static final Logger LOG = Logger.getLogger(CreateToString.class.getName());
 
-	public CreateToString(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public CreateToString(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 	}
 
@@ -63,7 +58,6 @@ public class CreateToString extends Command {
 		// classOutline.target.model.
 
 		// classOutline.target.getAnnotations();
-
 		if (implClass.name().equals("Coordinate")) {
 			return;
 		}
@@ -72,10 +66,10 @@ public class CreateToString extends Command {
 			return;
 		}
 
-		CClassInfo target = classOutline.target;
-		ArrayList<String> props = new ArrayList<String>();
+		final CClassInfo target = classOutline.target;
+		final ArrayList<String> props = new ArrayList<String>();
 		if (target.isOrdered()) {
-			for (CPropertyInfo p : target.getProperties()) {
+			for (final CPropertyInfo p : target.getProperties()) {
 				if (!(p instanceof CAttributePropertyInfo)) {
 					if (!((p instanceof CReferencePropertyInfo) && ((CReferencePropertyInfo) p).isDummy())) {
 						props.add(p.getName(false));
@@ -83,14 +77,14 @@ public class CreateToString extends Command {
 				}
 			}
 		}
-
+		
 		// check for suitable fields
 		final ArrayList<JFieldVar> fields = getRelevantFields(implClass);
-		HashSet<JFieldVar> fff = new HashSet<JFieldVar>();
-		for (JFieldVar jFieldVar : fields) {
+		final HashSet<JFieldVar> fff = new HashSet<JFieldVar>();
+		for (final JFieldVar jFieldVar : fields) {
 			fff.add(jFieldVar);
-    }
-		
+		}
+
 		// generate only if suitable fields exist
 		if (fields.size() == 0) {
 			return;
@@ -107,99 +101,11 @@ public class CreateToString extends Command {
 		// annotate with @Override
 		toString.annotate(Override.class);
 
-		for (JFieldVar jFieldVar : fields) {
-			System.out.println("!!!!!!!!!!!!!!!!!!!!! " + jFieldVar.name());
+		for (final JFieldVar jFieldVar : fields) {
+			LOG.info("!!!!!!!!!!!!!!!!!!!!! " + jFieldVar.name());
 		}
 
-		// List<CPropertyInfo> properties = classOutline.target.getProperties();
-		// // for (CPropertyInfo cPropertyInfo : properties) {
-		// for (CPropertyInfo cPropertyInfo : properties) {
-		//			
-		// System.out.println("!!!!!!!!!!!!!!!!!!!!! " + cPropertyInfo.realization.toString() );
-		// }
-		//
-		// // cast: TYPE other = (TYPE) obj;
-		//
-		// /*
-		// * check for each declared field distinguish between primitive types:
-		// *
-		// * <pre> if (field != other.field) { return false; } </pre>
-		// *
-		// * and reference types: <pre> if (field == null) { if (other.field != null) { return false; } } else if (!field.equals(other.field)) {
-		// * // --> if (field.equals(other.field) == false) return false; } </code>
-		// */
-		// JConditional condFieldCheck;
-		// boolean containsDouble = false;
-		// for (final JFieldVar jFieldVar : fields) {
-		// if (jFieldVar.type().fullName().equals("java.lang.Double") || jFieldVar.type().fullName().equals("double")) {
-		// jFieldVar.type(implClass.owner().DOUBLE);
-		// containsDouble = true;
-		// // break;
-		// }
-		// }
-		//
-		//	
-		//
-		//
-		// // useful fields
-		// final JFieldRef vPrime = JExpr.ref("prime");
-		// final JFieldRef vResult = JExpr.ref("result");
-		//
-		// // ==> final int prime = 31;
-		// toString.body().assign(JExpr.ref("final int prime"), JExpr.ref("31"));
-		//
-		// // ==> int result = 1; || int result = super.hashCode();
-		// JExpression initializeResult = null;
-		// if (isSuperClass) {
-		// initializeResult = JExpr._super().invoke("hashCode");
-		// } else {
-		// initializeResult = JExpr.ref("1");
-		// }
-		// toString.body().assign(JExpr.ref("int result"), initializeResult);
-		//
-		// // if class contains double
-		// // long temp;
-		// JVar tempVariableForDoubleChecks = null;
-		// JType doubleClass = null;
-		// if (containsDouble == true) {
-		// tempVariableForDoubleChecks = toString.body().decl(implClass.owner().LONG, "temp");
-		// doubleClass = implClass.owner()._ref(Double.class);
-		// }
-		//
-		// JExpression tenaryCond;
-		// for (final JFieldVar jFieldVar : fields) {
-		// if (jFieldVar.type().isPrimitive()) {
-		// if (jFieldVar.type().fullName().equals("double")) {
-		// // temp = Double.doubleToLongBits(altitude);
-		// // result = prime * result + (int) (temp ^ (temp >>> 32));
-		// // LOG.info("implClass: " + implClass.name());
-		// // LOG.info("jFieldVar: " + jFieldVar.name());
-		// // LOG.info(" is " + jFieldVar.type().fullName());
-		// // LOG.info(" + " + tempVariableForDoubleChecks.name());
-		// // LOG.info(" + " + doubleClass.boxify().fullName());
-		// toString.body().assign(tempVariableForDoubleChecks, doubleClass.boxify().staticInvoke("doubleToLongBits").arg(jFieldVar));
-		// tenaryCond = JExpr.cast(implClass.owner().INT, tempVariableForDoubleChecks.xor(tempVariableForDoubleChecks.shrz(JExpr
-		// .direct("32"))));
-		// } else {
-		// // if field is primitive:
-		// // ==> result = prime * result + field;
-		// tenaryCond = JExpr.ref(jFieldVar.name());
-		// }
-		// } else {
-		// // else:
-		// // ==> result = prime * result + ((field == null) ? 0 :
-		// tenaryCond = JOp.cond(JOp.eq(JExpr.ref(jFieldVar.name()), JExpr._null()), JExpr.ref("0"), JExpr.invoke(JExpr.ref(jFieldVar.name()),
-		// "hashCode"));
-		// }
-		//
-		// final JExpression hashCodeCollection = JOp.mul(vPrime, vResult);
-		// final JExpression addition = JOp.plus(hashCodeCollection, tenaryCond);
-		//
-		// // add each value that influence to the method
-		// toString.body().assign(vResult, addition);
-		// }
-		//
-		// // the returned hashCode
+		
 		toString.body()._return(JExpr.lit("null"));
 	}
 
@@ -236,6 +142,37 @@ public class CreateToString extends Command {
 			fields.add(field);
 		}
 		return fields;
+	}
+
+	private List<Field> getFieldsWith(Class clazz, Class annotation) {
+		Field[] fields = clazz.getDeclaredFields();
+		List<Field> fList = new ArrayList<Field>();
+		for (Field f : fields) {
+			Annotation[] annos = f.getDeclaredAnnotations();
+			for (Annotation a : annos) {
+				if (annotation.isInstance(a)) {
+					fList.add(f);
+					break;
+				}
+			}
+		}
+		return fList;
+	}
+
+	private Map<String, String> getSchemaNames(Class clazz) throws Exception {
+		Field[] fields = clazz.getDeclaredFields();
+		Map<String, String> field2tag = new HashMap<String, String>();
+		for (Field f : fields) {
+			Annotation[] annos = f.getDeclaredAnnotations();
+			for (Annotation a : annos) {
+				if (a instanceof XmlElement || a instanceof XmlAttribute) {
+					Class annoClass = a.annotationType();
+					String tName = (String) annoClass.getMethod("name").invoke(a);
+					field2tag.put(f.getName(), tName);
+				}
+			}
+		}
+		return field2tag;
 	}
 
 }

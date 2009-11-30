@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
-import javax.xml.bind.JAXBException;
-
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.Tag;
@@ -46,12 +44,12 @@ public class PrepareDocumentation {
 	 * 
 	 * @throws IOException
 	 */
-	private static HashMap<String, KMLReferenceField> parseKmlReferenceForSuitableJavaDoc(String kmlReferenceHtmlPage)
+	private static HashMap<String, KMLReferenceField> parseKmlReferenceForSuitableJavaDoc(final String kmlReferenceHtmlPage)
 	    throws MalformedURLException, IOException {
-		Source source = new Source(new URL(kmlReferenceHtmlPage));
+		final Source source = new Source(new URL(kmlReferenceHtmlPage));
 
 		// look out for these tags
-		ArrayList<String> lookForTheseTags = new ArrayList<String>();
+		final ArrayList<String> lookForTheseTags = new ArrayList<String>();
 		lookForTheseTags.add("p");
 		lookForTheseTags.add("pre");
 		lookForTheseTags.add("ul");
@@ -61,15 +59,15 @@ public class PrepareDocumentation {
 		lookForTheseTags.add("table");
 
 		// returns a list with all (html-) elements found in the kml-reference-guide
-		List<Element> allHtmlElements = source.getAllElements();
-		HashMap<String, KMLReferenceField> kmlElements = preParseElements(allHtmlElements);
+		final List<Element> allHtmlElements = source.getAllElements();
+		final HashMap<String, KMLReferenceField> kmlElements = preParseElements(allHtmlElements);
 
-		for (Element htmlElement : allHtmlElements) {
+		for (final Element htmlElement : allHtmlElements) {
 			// each kml element has a h2-heading!
 			if (htmlElement.getName().equals("h2")) {
 				LOG.info("-------------------------------------------------------------------------------");
-				String kmlElementName = htmlElement.getTextExtractor().toString();
-				String kmlElementNameClean = cleanTagName(kmlElementName);
+				final String kmlElementName = htmlElement.getTextExtractor().toString();
+				final String kmlElementNameClean = cleanTagName(kmlElementName);
 
 				// take a look if the element is already know - if not, create a new one
 				KMLReferenceField kmlField = kmlElements.get(kmlElementNameClean);
@@ -129,20 +127,20 @@ public class PrepareDocumentation {
 	 * 
 	 * @return
 	 */
-	private static Tag checkForPossibleSubElements(Tag ownerTag, ArrayList<String> lookForTheseTags, KMLReferenceField kmlField,
-	    HashMap<String, KMLReferenceField> kmlElements) {
+	private static Tag checkForPossibleSubElements(final Tag ownerTag, final ArrayList<String> lookForTheseTags, final KMLReferenceField kmlField,
+	    final HashMap<String, KMLReferenceField> kmlElements) {
 
 		Tag currentTag = ownerTag.getElement().getEndTag().getNextTag();
-		String h3Header = ownerTag.getElement().getTextExtractor().toString().trim().toLowerCase();
+		final String h3Header = ownerTag.getElement().getTextExtractor().toString().trim().toLowerCase();
 
 		// if current tag is a h3-tag, check of element-properties
 		while (!currentTag.getName().equals("h3")) {
 
-			for (String foundpossibleSubTag : lookForTheseTags) {
+			for (final String foundpossibleSubTag : lookForTheseTags) {
 				// if possible substring iss found and is not annotated as "back-to-top" then examine the element-kind
 				if (currentTag.getName().equals(foundpossibleSubTag) && !"backtotop".equals(currentTag.getElement().getAttributeValue("class"))) {
 
-					String textFromCurrentElement = currentTag.getElement().getTextExtractor().toString().trim();
+					final String textFromCurrentElement = currentTag.getElement().getTextExtractor().toString().trim();
 					// if there is no text in the current element -> skip to the next tag
 					if (textFromCurrentElement.length() == 0) {
 						continue;
@@ -154,7 +152,7 @@ public class PrepareDocumentation {
 					 */
 					if (h3Header.startsWith("syntax")) {
 						// LOG.info("Syntax:     \t" + textFromCurrentElement);
-						for (Element elementPre : currentTag.getChildElements()) {
+						for (final Element elementPre : currentTag.getChildElements()) {
 							kmlField.addToSyntax(elementPre.toString());
 						}
 					}
@@ -177,9 +175,9 @@ public class PrepareDocumentation {
 							kmlField.addToExtend(textFromCurrentElement);
 							LOG.info("Extends:     \t" + textFromCurrentElement);
 						} else if (currentTag.getName().equals("ul")) {
-							for (Element elementUL : currentTag.getElement().getChildElements()) {
+							for (final Element elementUL : currentTag.getElement().getChildElements()) {
 
-								for (Element elementLI : elementUL.getChildElements()) {
+								for (final Element elementLI : elementUL.getChildElements()) {
 									kmlField.addToExtend(elementLI.getTextExtractor().toString());
 									LOG.info("Extends:     \t" + elementLI.getTextExtractor().toString());
 								}
@@ -198,7 +196,7 @@ public class PrepareDocumentation {
 							kmlField.addToExtendedBy(textFromCurrentElement);
 							LOG.info("Extended By: \t" + textFromCurrentElement);
 						} else if (currentTag.getName().equals("ul")) {
-							for (Element elementUL : currentTag.getElement().getChildElements()) {
+							for (final Element elementUL : currentTag.getElement().getChildElements()) {
 								// text in ul we want is encapsulated in <a>- or
 								// in <strong>-tag
 								LOG.info("Extended By: \t" + elementUL.getStartTag().getNextTag().getElement().getTextExtractor().toString());
@@ -216,7 +214,7 @@ public class PrepareDocumentation {
 					else if (h3Header.startsWith("elements specific to")) {
 						if ((currentTag.getName().equals("p") || currentTag.getName().equals("dl") || currentTag.getName().equals("dt") || currentTag
 						    .getName().equals("ul"))) {
-							Tag endTag = currentTag.getElement().getEndTag();
+							final Tag endTag = currentTag.getElement().getEndTag();
 
 							KMLReferenceField foundSpecificToField = null;
 							while (currentTag.getEnd() < endTag.getEnd()) {
@@ -237,7 +235,7 @@ public class PrepareDocumentation {
 								 * specific to field found check if, it is already known in the kmlElements-map and of not, register it.
 								 */
 								if (currentTag.getName().equals("dt")) {
-									String cleanSpecificElementName = cleanTagName(currentTag.getElement().getTextExtractor().toString().toLowerCase().trim());
+									final String cleanSpecificElementName = cleanTagName(currentTag.getElement().getTextExtractor().toString().toLowerCase().trim());
 									foundSpecificToField = kmlElements.get(cleanSpecificElementName);
 
 									// special case for <icon> to prevent the creation of an empty element
@@ -257,7 +255,7 @@ public class PrepareDocumentation {
 
 								// add description and (if found) the syntax-example to an possible found "specific-to"-field
 								if (foundSpecificToField != null) {
-									String currentText = currentTag.getElement().getTextExtractor().toString();
+									final String currentText = currentTag.getElement().getTextExtractor().toString();
 									if (currentText.length() > 0) {
 										// description is found
 										if (currentTag.getName().equals("dd") || currentTag.getName().equals("p")) {
@@ -308,8 +306,8 @@ public class PrepareDocumentation {
 							kmlField.addToSeealso(textFromCurrentElement);
 							LOG.info("See Also:    \t" + textFromCurrentElement);
 						} else if (currentTag.getName().equals("ul")) {
-							for (Element elementUL : currentTag.getElement().getChildElements()) {
-								for (Element elementLI : elementUL.getChildElements()) {
+							for (final Element elementUL : currentTag.getElement().getChildElements()) {
+								for (final Element elementLI : elementUL.getChildElements()) {
 									kmlField.addToSeealso(elementLI.getTextExtractor().toString());
 									LOG.info("See Also:    \t" + elementLI.getTextExtractor().toString());
 								}
@@ -336,8 +334,8 @@ public class PrepareDocumentation {
 							kmlField.addToContains(textFromCurrentElement);
 							LOG.info("Contains:     \t" + textFromCurrentElement);
 						} else if (currentTag.getName().equals("ul")) {
-							for (Element elementUL : currentTag.getElement().getChildElements()) {
-								for (Element elementLI : elementUL.getChildElements()) {
+							for (final Element elementUL : currentTag.getElement().getChildElements()) {
+								for (final Element elementLI : elementUL.getChildElements()) {
 									kmlField.addToContains(elementLI.getTextExtractor().toString());
 									LOG.info("Contains:     \t" + elementLI.getTextExtractor().toString());
 								}
@@ -356,8 +354,8 @@ public class PrepareDocumentation {
 							kmlField.addToContainedBy(textFromCurrentElement);
 							LOG.info("Contained By: \t" + textFromCurrentElement);
 						} else if (currentTag.getName().equals("ul")) {
-							for (Element elementUL : currentTag.getElement().getChildElements()) {
-								for (Element elementLI : elementUL.getChildElements()) {
+							for (final Element elementUL : currentTag.getElement().getChildElements()) {
+								for (final Element elementLI : elementUL.getChildElements()) {
 									kmlField.addToContainedBy(elementLI.getTextExtractor().toString());
 									LOG.info("Contained By: \t" + elementLI.getTextExtractor().toString());
 								}
@@ -392,13 +390,13 @@ public class PrepareDocumentation {
 	 * @throws MalformedURLException
 	 * @throws IOException
 	 */
-	public static HashMap<String, JaxbJavaDoc> buildDocumentationFromFoundElements(String kmlReferenceHtmlPage, String saveToFile)
+	public static HashMap<String, JaxbJavaDoc> buildDocumentationFromFoundElements(final String kmlReferenceHtmlPage, final String saveToFile)
 	    throws MalformedURLException, IOException {
-		HashMap<String, KMLReferenceField> kmlElements = parseKmlReferenceForSuitableJavaDoc(kmlReferenceHtmlPage);
+		final HashMap<String, KMLReferenceField> kmlElements = parseKmlReferenceForSuitableJavaDoc(kmlReferenceHtmlPage);
 		if ((kmlElements == null) || (kmlElements.size() == 0)) {
 			return null;
 		}
-		HashMap<String, JaxbJavaDoc> jaxbKMLJavadocs = new HashMap<String, JaxbJavaDoc>();
+		final HashMap<String, JaxbJavaDoc> jaxbKMLJavadocs = new HashMap<String, JaxbJavaDoc>();
 
 		// adding the KML fields listed on the webpage
 		kmlElements.put("altitudemode",
@@ -422,20 +420,20 @@ public class PrepareDocumentation {
 		kmlElements.put("viewrefreshmode", addSimpleField("ViewRefreshMode", "never, onRequest, onStop, onRegion ", "See <Link>"));
 
 		// iterate over all elements found in the kml-refernce
-		for (Entry<String, KMLReferenceField> entry : kmlElements.entrySet()) {
+		for (final Entry<String, KMLReferenceField> entry : kmlElements.entrySet()) {
 			// skip elements, that have no values
 			if (entry.getValue().getName() == null) {
 				continue;
 			}
 
-			KMLReferenceField kmlEntry = entry.getValue();
+			final KMLReferenceField kmlEntry = entry.getValue();
 
-			JaxbJavaDoc jkje = new JaxbJavaDoc();
+			final JaxbJavaDoc jkje = new JaxbJavaDoc();
 			// the class name, should be the same-classname as the jaxb-generated classname
 			jkje.setClassName(entry.getValue().getNameClean());
 
 			// build the javadoc comment
-			StringBuffer javaDoc = new StringBuffer();
+			final StringBuffer javaDoc = new StringBuffer();
 
 			// the kml-element-name
 			javaDoc.append(kmlEntry.getName() + "\n");
@@ -460,7 +458,7 @@ public class PrepareDocumentation {
 			// extends
 			if (kmlEntry.getExtend().size() > 0) {
 				javaDoc.append("Extends: \n");
-				for (String docExtends : convertMapToList(kmlEntry.getExtend())) {
+				for (final String docExtends : convertMapToList(kmlEntry.getExtend())) {
 					javaDoc.append("@see: " + docExtends + "\n");
 				}
 				javaDoc.append("\n");
@@ -469,7 +467,7 @@ public class PrepareDocumentation {
 			// extended by
 			if (kmlEntry.getExtendedBy().size() > 0) {
 				javaDoc.append("Extended By: \n");
-				for (String docExtendedBy : convertMapToList(kmlEntry.getExtendedBy())) {
+				for (final String docExtendedBy : convertMapToList(kmlEntry.getExtendedBy())) {
 					javaDoc.append("@see: " + docExtendedBy + "\n");
 				}
 				javaDoc.append("\n");
@@ -478,7 +476,7 @@ public class PrepareDocumentation {
 			// contains
 			if (kmlEntry.getContains().size() > 0) {
 				javaDoc.append("Contains: \n");
-				for (String docContains : convertMapToList(kmlEntry.getContains())) {
+				for (final String docContains : convertMapToList(kmlEntry.getContains())) {
 					javaDoc.append("@see: " + docContains + "\n");
 				}
 				javaDoc.append("\n");
@@ -487,7 +485,7 @@ public class PrepareDocumentation {
 			// contained by
 			if (kmlEntry.getContainedBy().size() > 0) {
 				javaDoc.append("Contained By: \n");
-				for (String docContainedBy : convertMapToList(kmlEntry.getContainedBy())) {
+				for (final String docContainedBy : convertMapToList(kmlEntry.getContainedBy())) {
 					javaDoc.append("@see: " + docContainedBy + "\n");
 				}
 				javaDoc.append("\n");
@@ -496,7 +494,7 @@ public class PrepareDocumentation {
 			// see also
 			if (kmlEntry.getSeealso().size() > 0) {
 				javaDoc.append("See Also: \n");
-				for (String docSeeAlso : convertMapToList(kmlEntry.getSeealso())) {
+				for (final String docSeeAlso : convertMapToList(kmlEntry.getSeealso())) {
 					javaDoc.append(docSeeAlso + "\n");
 				}
 				javaDoc.append("\n");
@@ -516,7 +514,7 @@ public class PrepareDocumentation {
 		return jaxbKMLJavadocs;
 	}
 
-	private static ArrayList<String> convertMapToList(ArrayList<String> seealso) {
+	private static ArrayList<String> convertMapToList(final ArrayList<String> seealso) {
 		Collections.sort(seealso);
 	  return seealso;
   }
@@ -530,8 +528,8 @@ public class PrepareDocumentation {
 	 * 
 	 * @return a simple Element
 	 */
-	private static KMLReferenceField addSimpleField(String name, String description, String seeAlso) {
-		KMLReferenceField kmlField = new KMLReferenceField();
+	private static KMLReferenceField addSimpleField(final String name, final String description, final String seeAlso) {
+		final KMLReferenceField kmlField = new KMLReferenceField();
 
 		kmlField.setName(name);
 		kmlField.setNameClean(name.toLowerCase().trim());
@@ -550,14 +548,14 @@ public class PrepareDocumentation {
 	 * 
 	 * @return
 	 */
-	private static String makeLineBrakes(String text, int maxLineBreakLength) {
-		StringBuffer string = new StringBuffer();
-		StringTokenizer tokens = new StringTokenizer(text);
-		ArrayList<String> lines = new ArrayList<String>();
+	private static String makeLineBrakes(final String text, final int maxLineBreakLength) {
+		final StringBuffer string = new StringBuffer();
+		final StringTokenizer tokens = new StringTokenizer(text);
+		final ArrayList<String> lines = new ArrayList<String>();
 
 		// take the string
 		while (tokens.hasMoreElements()) {
-			String object = (String) tokens.nextElement();
+			final String object = (String) tokens.nextElement();
 			string.append(object + " ");
 
 			// insert every n-chars an \n
@@ -569,7 +567,7 @@ public class PrepareDocumentation {
 		}
 
 		// build the text block
-		for (String line : lines) {
+		for (final String line : lines) {
 			string.append(line);
 		}
 
@@ -584,13 +582,13 @@ public class PrepareDocumentation {
 	 * 
 	 * @param kmlElements
 	 */
-	private static HashMap<String, KMLReferenceField> preParseElements(List<Element> allHtmlElements) {
-		HashMap<String, KMLReferenceField> kmlElements = new HashMap<String, KMLReferenceField>();
+	private static HashMap<String, KMLReferenceField> preParseElements(final List<Element> allHtmlElements) {
+		final HashMap<String, KMLReferenceField> kmlElements = new HashMap<String, KMLReferenceField>();
 
-		for (Element htmlElement : allHtmlElements) {
+		for (final Element htmlElement : allHtmlElements) {
 			if (htmlElement.getName().equals("ul") && "1-sub-1".equals(htmlElement.getAttributeValue("id"))) {
-				for (Element elementLI : htmlElement.getChildElements()) {
-					String cleanTitle = cleanTagName(elementLI.getTextExtractor().toString().toLowerCase());
+				for (final Element elementLI : htmlElement.getChildElements()) {
+					final String cleanTitle = cleanTagName(elementLI.getTextExtractor().toString().toLowerCase());
 					kmlElements.put(cleanTitle, new KMLReferenceField());
 				}
 				LOG.info(kmlElements.keySet().toString());
@@ -605,7 +603,7 @@ public class PrepareDocumentation {
 	 * cleans a tag <pre> - <range> (required) --> <range> - <SimpleField type="string" name="string"> --> <simplefield> - <gx:flyto> -->
 	 * <flyto> && <atom:author> --> <author> </pre>
 	 */
-	private static String cleanTagName(String title) {
+	private static String cleanTagName(final String title) {
 		String cleanTitle = title.toLowerCase();
 		if (cleanTitle.contains("<") && cleanTitle.contains(">")) {
 
@@ -634,24 +632,24 @@ public class PrepareDocumentation {
 	 * 
 	 * @param javadocElements
 	 */
-	private static void saveJavaDocObjectIntoXmlFile(String saveToFile, HashMap<String, JaxbJavaDoc> javadocElements) {
+	private static void saveJavaDocObjectIntoXmlFile(final String saveToFile, final HashMap<String, JaxbJavaDoc> javadocElements) {
 		if ((javadocElements == null) || (javadocElements.size() == 0)) {
 			return;
 		}
-		JaxbJavaDocElements jdel = new JaxbJavaDocElements();
-		ArrayList<JaxbJavaDoc> elementsjavadoc = convertHashMapToArrayList(javadocElements);
+		final JaxbJavaDocElements jdel = new JaxbJavaDocElements();
+		final ArrayList<JaxbJavaDoc> elementsjavadoc = convertHashMapToArrayList(javadocElements);
 		jdel.setElements(elementsjavadoc);
 
 		JaxbTool<JaxbJavaDocElements> jaxt;
 		try {
 			jaxt = new JaxbTool<JaxbJavaDocElements>(JaxbJavaDocElements.class);
-			String schemaFileName = saveToFile.replaceAll("(.*?)(.xml)$", "$1.xsd");
+			final String schemaFileName = saveToFile.replaceAll("(.*?)(.xml)$", "$1.xsd");
 			jaxt.generateSchema(schemaFileName);
 			LOG.info("------------ written Schema-file:  " + schemaFileName);
 
 			jaxt.marshal(jdel, new FileOutputStream(saveToFile));
 			LOG.info("------------ written JavaDoc-file: " + saveToFile);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -663,22 +661,22 @@ public class PrepareDocumentation {
 	 * 
 	 * @return the newly created ArrayList
 	 */
-	private static ArrayList<JaxbJavaDoc> convertHashMapToArrayList(HashMap<String, JaxbJavaDoc> hashmap) {
-		ArrayList<JaxbJavaDoc> elementsjavadoc = new ArrayList<JaxbJavaDoc>();
-		for (JaxbJavaDoc arraylist : hashmap.values()) {
+	private static ArrayList<JaxbJavaDoc> convertHashMapToArrayList(final HashMap<String, JaxbJavaDoc> hashmap) {
+		final ArrayList<JaxbJavaDoc> elementsjavadoc = new ArrayList<JaxbJavaDoc>();
+		for (final JaxbJavaDoc arraylist : hashmap.values()) {
 			elementsjavadoc.add(arraylist);
 		}
 		return elementsjavadoc;
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(final String[] args) throws Exception {
 		BasicConfigurator.configure();
 		try {
 			PrepareDocumentation.buildDocumentationFromFoundElements("file:src/main/resources/data/090812_kmlreference22_ext_firefox.html",
 					AddProperJavaDocumentationForKML.LOADJAVADOCSFROMFILE);
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}

@@ -46,7 +46,7 @@ public class KMLReferenceField {
 		return this.syntax;
 	}
 
-	public void addToSyntax(String syntax) {
+	public void addToSyntax(final String syntax) {
 		this.syntax.add(syntax);
 	}
 
@@ -54,7 +54,7 @@ public class KMLReferenceField {
 		return this.elementsSpecificTo;
 	}
 
-	public void addToElementsSpecificTo(String elementsSpecificTo) {
+	public void addToElementsSpecificTo(final String elementsSpecificTo) {
 		this.elementsSpecificTo.add(elementsSpecificTo);
 	}
 
@@ -62,7 +62,7 @@ public class KMLReferenceField {
 		return this.description;
 	}
 
-	public void addToDescription(String description) {
+	public void addToDescription(final String description) {
 		this.description.add(description);
 	}
 
@@ -70,7 +70,7 @@ public class KMLReferenceField {
 		return this.extend;
 	}
 
-	public void addToExtend(String extend) {
+	public void addToExtend(final String extend) {
 		this.extend.add(extend);
 	}
 
@@ -78,7 +78,7 @@ public class KMLReferenceField {
 		return this.extendedBy;
 	}
 
-	public void addToExtendedBy(String extendedBy) {
+	public void addToExtendedBy(final String extendedBy) {
 		this.extendedBy.add(extendedBy);
 	}
 
@@ -86,7 +86,7 @@ public class KMLReferenceField {
 		return this.contains;
 	}
 
-	public void addToContains(String contains) {
+	public void addToContains(final String contains) {
 		this.contains.add(contains);
 	}
 
@@ -94,7 +94,7 @@ public class KMLReferenceField {
 		return this.example;
 	}
 
-	public void addToExample(String example) {
+	public void addToExample(final String example) {
 		this.example.add(example);
 	}
 
@@ -102,7 +102,7 @@ public class KMLReferenceField {
 		return this.containedBy;
 	}
 
-	public void addToContainedBy(String containedBy) {
+	public void addToContainedBy(final String containedBy) {
 		this.containedBy.add(containedBy);
 	}
 
@@ -110,47 +110,47 @@ public class KMLReferenceField {
 		return this.seealso;
 	}
 
-	public void addToSeealso(String seealso) {
+	public void addToSeealso(final String seealso) {
 		this.seealso.add(seealso);
 	}
 
-	public void setSyntax(ArrayList<String> syntax) {
+	public void setSyntax(final ArrayList<String> syntax) {
 		this.syntax = syntax;
 	}
 
-	public void setElementsSpecificTo(ArrayList<String> elementsSpecificTo) {
+	public void setElementsSpecificTo(final ArrayList<String> elementsSpecificTo) {
 		this.elementsSpecificTo = elementsSpecificTo;
 	}
 
-	public void setDescription(ArrayList<String> description) {
+	public void setDescription(final ArrayList<String> description) {
 		this.description = description;
 	}
 
-	public void setExtend(ArrayList<String> extend) {
+	public void setExtend(final ArrayList<String> extend) {
 		this.extend = extend;
 	}
 
-	public void setExtendedBy(ArrayList<String> extendedBy) {
+	public void setExtendedBy(final ArrayList<String> extendedBy) {
 		this.extendedBy = extendedBy;
 	}
 
-	public void setContains(ArrayList<String> contains) {
+	public void setContains(final ArrayList<String> contains) {
 		this.contains = contains;
 	}
 
-	public void setExample(ArrayList<String> example) {
+	public void setExample(final ArrayList<String> example) {
 		this.example = example;
 	}
 
-	public void setContainedBy(ArrayList<String> containedBy) {
+	public void setContainedBy(final ArrayList<String> containedBy) {
 		this.containedBy = containedBy;
 	}
 
-	public void setSeealso(ArrayList<String> seealso) {
+	public void setSeealso(final ArrayList<String> seealso) {
 		this.seealso = seealso;
 	}
 
-	public void setGxExtension(boolean gxExtension) {
+	public void setGxExtension(final boolean gxExtension) {
 		this.gxExtension = gxExtension;
 	}
 
@@ -162,7 +162,7 @@ public class KMLReferenceField {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -170,7 +170,7 @@ public class KMLReferenceField {
 		return this.nameClean;
 	}
 
-	public void setNameClean(String nameClean) {
+	public void setNameClean(final String nameClean) {
 		this.nameClean = nameClean;
 	}
 }

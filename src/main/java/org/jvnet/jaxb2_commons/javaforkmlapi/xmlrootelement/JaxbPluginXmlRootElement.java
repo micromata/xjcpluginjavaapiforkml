@@ -1,12 +1,8 @@
 package org.jvnet.jaxb2_commons.javaforkmlapi.xmlrootelement;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
@@ -15,7 +11,6 @@ import org.jvnet.jaxb2_commons.javaforkmlapi.primitives.ConvertComplexTypesToSim
 import org.xml.sax.ErrorHandler;
 
 import com.sun.codemodel.JCodeModel;
-import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.generator.annotation.spec.XmlRootElementWriter;
@@ -36,7 +31,7 @@ import de.micromata.javaapiforkml.JaxbTool;
 	public class JaxbPluginXmlRootElement extends Command {
 		private static final Logger LOG = Logger.getLogger(ConvertComplexTypesToSimpleTypes.class.getName());
 
-		private JCodeModel cm;
+		private final JCodeModel cm;
 
 		private int replacedTypes;
 		/** load from this file */
@@ -45,10 +40,10 @@ import de.micromata.javaapiforkml.JaxbTool;
 		private HashMap<String, String> annotateTheseElementsDifferent;
 
 		
-		public JaxbPluginXmlRootElement(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+		public JaxbPluginXmlRootElement(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 			super(outline, opts, errorHandler, pool);
-			Iterable< ? extends PackageOutline> allPackageContexts = this.outline.getAllPackageContexts();
-			for (PackageOutline packageOutline : allPackageContexts) {
+			final Iterable< ? extends PackageOutline> allPackageContexts = this.outline.getAllPackageContexts();
+			for (final PackageOutline packageOutline : allPackageContexts) {
 	     
 	      
 	      LOG.info("f<<<<>>>>>>>>>>>>>>>>" + packageOutline.getMostUsedNamespaceURI() );
@@ -122,7 +117,7 @@ import de.micromata.javaapiforkml.JaxbTool;
 
 	private void annotateEnums(final EnumOutline cc) {
 
-		String currentClassName = eliminateTypeSuffixCaseSensitive(cc.clazz.name().toLowerCase());
+		final String currentClassName = eliminateTypeSuffixCaseSensitive(cc.clazz.name().toLowerCase());
 		// LOG.info("[JaxbPluginXmlRootElement] " + currentClassName );
 		//if (quickAndSimpleAnnotateTheseElementsWithXmlRootElement.containsKey(currentClassName)) {
 			if (cc.target.isElement()) {
@@ -137,10 +132,10 @@ import de.micromata.javaapiforkml.JaxbTool;
 				xmlRootElementName = eliminateTypeSuffixCaseSensitive(cc.clazz.name());
 			}	
 			
-			String mostUsedNamespaceURI = cc._package().getMostUsedNamespaceURI();
+			final String mostUsedNamespaceURI = cc._package().getMostUsedNamespaceURI();
 			// [RESULT]
 			// @XmlRootElement(name = "foo", namespace = "bar://baz")
-			XmlRootElementWriter xrew = cc.clazz.annotate2(XmlRootElementWriter.class);
+			final XmlRootElementWriter xrew = cc.clazz.annotate2(XmlRootElementWriter.class);
 			xrew.name(xmlRootElementName);
 			//xrew.namespace(mostUsedNamespaceURI);
 			LOG.info("E> added @XmlRootElement(name = '" + xmlRootElementName + "', namespace = '" + mostUsedNamespaceURI + "')");
@@ -149,7 +144,7 @@ import de.micromata.javaapiforkml.JaxbTool;
 	}
 
 	private void annotateClasses(final ClassOutlineImpl cc) {
-		String currentClassName = eliminateTypeSuffixLowercase(cc.implRef.name().toLowerCase());
+		final String currentClassName = eliminateTypeSuffixLowercase(cc.implRef.name().toLowerCase());
 		// LOG.info("[JaxbPluginXmlRootElement] " + currentClassName );
 			if (cc.target.isElement()) {
 				LOG.info("> skipped " + cc.target.getName() + " because class is already annotated.");
@@ -169,10 +164,10 @@ import de.micromata.javaapiforkml.JaxbTool;
 			} else {
 				xmlRootElementName = eliminateTypeSuffixCaseSensitive(cc.implRef.name());
 			}	
-			String mostUsedNamespaceURI = cc._package().getMostUsedNamespaceURI();
+			final String mostUsedNamespaceURI = cc._package().getMostUsedNamespaceURI();
 			// [RESULT]
 			// @XmlRootElement(name = "foo", namespace = "bar://baz")
-			XmlRootElementWriter xrew = cc.implClass.annotate2(XmlRootElementWriter.class);
+			final XmlRootElementWriter xrew = cc.implClass.annotate2(XmlRootElementWriter.class);
 			xrew.name(xmlRootElementName);
 			//if (!mostUsedNamespaceURI.equals("http://www.opengis.net/kml/2.2")) {
 			xrew.namespace(mostUsedNamespaceURI);
@@ -182,7 +177,7 @@ import de.micromata.javaapiforkml.JaxbTool;
 		
 	}
 
-	private HashMap<String, String> getObjectsFromXmlWithJaxb(String loadJavaDocsFromFile) {
+	private HashMap<String, String> getObjectsFromXmlWithJaxb(final String loadJavaDocsFromFile) {
 		HashMap<String, String> xmlRootElements = null;
 		JaxbTool<JaxbXmlRootElements> jaxt;
     JaxbXmlRootElements unmarshalledElements = null;
@@ -205,9 +200,9 @@ import de.micromata.javaapiforkml.JaxbTool;
 	 * 
 	 * @return the newly created HashMap
 	 */
-	private static HashMap<String, String> convertArrayListToHashMap(List<JaxbXmlRootElement> arraylist) {
-		HashMap<String, String> hashmap = new HashMap<String, String>();
-		for (JaxbXmlRootElement jaxbJavaDoc : arraylist) {
+	private static HashMap<String, String> convertArrayListToHashMap(final List<JaxbXmlRootElement> arraylist) {
+		final HashMap<String, String> hashmap = new HashMap<String, String>();
+		for (final JaxbXmlRootElement jaxbJavaDoc : arraylist) {
 			hashmap.put(jaxbJavaDoc.getLowerCaseClassName().toLowerCase().trim(), jaxbJavaDoc.getNameInKmlFile());
 		}
 		return hashmap;

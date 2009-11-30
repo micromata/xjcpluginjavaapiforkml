@@ -30,7 +30,7 @@ public class PrepareXmlJaxbRootElementsFile {
 	 * @throws MalformedURLException
 	 * @throws IOException
 	 */
-	private static void buildDocumentationFromFoundElements(String saveToFile) {
+	private static void buildDocumentationFromFoundElements(final String saveToFile) {
 		quickAndSimpleAnnotateTheseElementsWithXmlRootElement = new HashMap<String, String>();
 		quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("camera", "Camera");
 		quickAndSimpleAnnotateTheseElementsWithXmlRootElement.put("document", "Document");
@@ -90,24 +90,24 @@ public class PrepareXmlJaxbRootElementsFile {
 	 * 
 	 * @param javadocElements
 	 */
-	private static void saveJavaDocObjectIntoXmlFile(String saveToFile, HashMap<String, String> javadocElements) {
+	private static void saveJavaDocObjectIntoXmlFile(final String saveToFile, final HashMap<String, String> javadocElements) {
 		if ((javadocElements == null) || (javadocElements.size() == 0)) {
 			return;
 		}
-		JaxbXmlRootElements jdel = new JaxbXmlRootElements();
-		ArrayList<JaxbXmlRootElement> elementsjavadoc = convertHashMapToArrayList(javadocElements);
+		final JaxbXmlRootElements jdel = new JaxbXmlRootElements();
+		final ArrayList<JaxbXmlRootElement> elementsjavadoc = convertHashMapToArrayList(javadocElements);
 		jdel.setElements(elementsjavadoc);
 
 		JaxbTool<JaxbXmlRootElements> jaxt;
 		try {
 			jaxt = new JaxbTool<JaxbXmlRootElements>(JaxbXmlRootElements.class);
-			String schemaFileName = saveToFile.replaceAll("(.*?)(.xml)$", "$1.xsd");
+			final String schemaFileName = saveToFile.replaceAll("(.*?)(.xml)$", "$1.xsd");
 			jaxt.generateSchema(schemaFileName);
 			LOG.info("------------ written Schema-file:  " + schemaFileName);
 
 			jaxt.marshal(jdel, new FileOutputStream(saveToFile));
 			LOG.info("------------ written JavaDoc-file: " + saveToFile);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -119,15 +119,15 @@ public class PrepareXmlJaxbRootElementsFile {
 	 * 
 	 * @return the newly created ArrayList
 	 */
-	private static ArrayList<JaxbXmlRootElement> convertHashMapToArrayList(HashMap<String, String> hashmap) {
-		ArrayList<JaxbXmlRootElement> elementsjavadoc = new ArrayList<JaxbXmlRootElement>();
-		for (Entry<String, String> arraylist : hashmap.entrySet()) {
+	private static ArrayList<JaxbXmlRootElement> convertHashMapToArrayList(final HashMap<String, String> hashmap) {
+		final ArrayList<JaxbXmlRootElement> elementsjavadoc = new ArrayList<JaxbXmlRootElement>();
+		for (final Entry<String, String> arraylist : hashmap.entrySet()) {
 			elementsjavadoc.add(new JaxbXmlRootElement(arraylist.getKey(), arraylist.getValue()));
 		}
 		return elementsjavadoc;
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(final String[] args) throws Exception {
 		BasicConfigurator.configure();
 		PrepareXmlJaxbRootElementsFile.buildDocumentationFromFoundElements(JaxbPluginXmlRootElement.LOADJAVADOCSFROMFILE);
 	}

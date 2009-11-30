@@ -11,7 +11,7 @@ public class JaxbXmlRootElement {
 	public JaxbXmlRootElement() {
 	}
 
-	public JaxbXmlRootElement(String lowerCaseClassName, String nameInKmlFile) {
+	public JaxbXmlRootElement(final String lowerCaseClassName, final String nameInKmlFile) {
 		this.lowerCaseClassName = lowerCaseClassName;
 		this.nameInKmlFile = nameInKmlFile;
 	}
@@ -21,11 +21,11 @@ public class JaxbXmlRootElement {
 		return nameInKmlFile;
 	}
 
-	public void setNameInKmlFile(String nameInKmlFile) {
+	public void setNameInKmlFile(final String nameInKmlFile) {
 		this.nameInKmlFile = nameInKmlFile;
 	}
 
-	public void setLowerCaseClassName(String lowerCaseClassName) {
+	public void setLowerCaseClassName(final String lowerCaseClassName) {
 	  this.lowerCaseClassName = lowerCaseClassName;
   }
 

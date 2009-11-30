@@ -10,13 +10,14 @@ import com.sun.xml.bind.api.impl.NameConverter;
 class OmitTypeNameConverter extends NameConverter.Standard {
 	private static final Logger LOG = Logger.getLogger(OmitTypeNameConverter.class.getName());
 
-	public String toClassName(String s) {
+	@Override
+  public String toClassName(String s) {
 		s = eliminateTypeSuffix(s);
 		return toMixedCaseName(toWordList(s), true);
 	}
 
 	private String eliminateTypeSuffix(String namewithoutType) {
-		StringBuffer tmp = new StringBuffer();
+		final StringBuffer tmp = new StringBuffer();
 		if (namewithoutType.endsWith("Type") && !namewithoutType.endsWith("listItemType")) {
 			namewithoutType = namewithoutType.substring(0, namewithoutType.length() - 4);
 			tmp.append("T");
@@ -40,7 +41,7 @@ class OmitTypeNameConverter extends NameConverter.Standard {
 		}
 
 		if (namewithoutType.equals("")) {
-			namewithoutType = new String("underscore");
+			namewithoutType = "underscore";
 		}
 
 		// if (namewithoutType.endsWith("ExtensionGroup")) {

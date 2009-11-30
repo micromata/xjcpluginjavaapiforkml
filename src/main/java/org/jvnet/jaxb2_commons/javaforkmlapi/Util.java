@@ -12,7 +12,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.sun.codemodel.JClass;
-import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JPackage;
@@ -32,24 +32,21 @@ import com.sun.xml.xsom.XSParticle;
 
 public class Util {
 	//private static final Logger LOG = Logger.getLogger(Util.class.getName());
+	final static Logger LOG = Logger.getLogger(Util.class.getName());
 
-	public static void logInfo(Class< ? > cazz, String output) {
-		Logger LOG = Logger.getLogger(cazz.getName());
+	
+	public static void logInfo(final String output) {
 	  LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " " + output);
   }
 	
-	public static void logInfo(String output) {
-		Logger LOG = Logger.getLogger(Util.class.getName());
-	  LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " " + output);
-  }
-	public static String calculateMethodName(ClassOutlineImpl cc, JPackage rootPackage) {
+	public static String calculateMethodName(final ClassOutlineImpl cc, final JPackage rootPackage) {
 		String tmppackagePrefix = "";
 		 if (!cc._package()._package().name().equals(rootPackage.name())) {
 		 tmppackagePrefix = cc._package()._package().name().replaceAll("(.*)(\\.)(.*$)", "$3");
 		 tmppackagePrefix = upperFirst(tmppackagePrefix);
 		 }
 
-		String methodName = tmppackagePrefix + cc.target.getSqueezedName();
+		final String methodName = tmppackagePrefix + cc.target.getSqueezedName();
 		return methodName;
 	}
 
@@ -76,12 +73,12 @@ public class Util {
 	}
 
 	/** Change the first character to the lower case. */
-	public static String lowerFirst(String s) {
+	public static String lowerFirst(final String s) {
 		return Character.toLowerCase(s.charAt(0)) + s.substring(1);
 	}
 
 	/** Change the first character to the upper case. */
-	public static String upperFirst(String s) {
+	public static String upperFirst(final String s) {
 		return Character.toUpperCase(s.charAt(0)) + s.substring(1);
 	}
 
@@ -96,24 +93,23 @@ public class Util {
 		return r;
 	}
 
-	public static HashMap<String, ClassOutlineImpl> getClassList(Outline outline) {
-		HashMap<String, ClassOutlineImpl> classList = new HashMap<String, ClassOutlineImpl>();
+	public static HashMap<String, ClassOutlineImpl> getClassList(final Outline outline) {
+		final HashMap<String, ClassOutlineImpl> classList = new HashMap<String, ClassOutlineImpl>();
 		for (final ClassOutline classOutline : outline.getClasses()) {
-			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
+			final ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 			classList.put(cc.target.fullName(), cc);
 		}
 		return classList;
 	}
 
-	public static JPackage getKmlClassPackage(Outline outline) {
+	public static JPackage getKmlClassPackage(final Outline outline) {
 		JPackage rootPackage = null;
-		for (PackageOutline packageoutline : outline.getAllPackageContexts()) {
+		for (final PackageOutline packageoutline : outline.getAllPackageContexts()) {
 			for (final ClassOutline classOutline : packageoutline.getClasses()) {
-				String currentClassName = Util.eliminateTypeSuffix(classOutline.implRef.name().toLowerCase());
+				final String currentClassName = Util.eliminateTypeSuffix(classOutline.implRef.name().toLowerCase());
 				// LOG.info(">>>>>>>> " + currentClassName);
 				if (currentClassName.equals("kml")) {
-					System.out
-					    .println(XJCJavaForKmlApiPlugin.PLUGINNAME + " package for kml-class: " + classOutline._package()._package().name() + " set as main package.");
+					//LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " package for kml-class: " + classOutline._package()._package().name() + " set as main package.");
 					rootPackage = classOutline._package()._package();
 					break;
 				}
@@ -123,90 +119,22 @@ public class Util {
 		return rootPackage;
 	}
 
-	public static HashSet<String> getAllNestedClasses(Outline outline) {
-	  HashSet<String> nestedClasses = new HashSet<String>();
+	public static HashSet<String> getAllNestedClasses(final Outline outline) {
+	  final HashSet<String> nestedClasses = new HashSet<String>();
 		for (final ClassOutline classOutline : outline.getClasses()) {
-			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
-			JClass[] classes = cc.implClass.listClasses();
-			for (JClass jClass : classes) {
+			final ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
+			final JClass[] classes = cc.implClass.listClasses();
+			for (final JClass jClass : classes) {
 	      
-//	      System.out.println(">>>> " + jClass.fullName());
+//	      LOG.info(">>>> " + jClass.fullName());
 	      nestedClasses.add(jClass.fullName());
       }
 		}
 		return nestedClasses;
   }
 	
-	/**
-	 * Takes a collection of fields, and returns a new collection containing only the instance (i.e. non-static) fields.
-	 */
-	@Deprecated
-	public static Collection<JFieldVar> getInstanceFields(final Collection<JFieldVar> fields) {
-		final List<JFieldVar> instanceFields = new ArrayList<JFieldVar>();
-		for (final JFieldVar field : fields) {
-			int mods = field.mods().getValue();
-
-			if ((mods & JMod.STATIC) != 0) {
-				continue;
-			}
-
-			if (field.name().contains("Deprecated")) {
-				// LOG.info("skip deprecated");
-				continue;
-			}
-
-			if (field.type().name().contains("Deprecated")) {
-				// LOG.info("skip deprecated");
-				continue;
-			}
-
-			// ugly quick fix
-			if (field.name().equals("link")) {
-				// LOG.info("skip link");
-				continue;
-			}
-
-			if (field.name().equals("AbstractObject")) {
-				logInfo(Util.class, "skip abstract object");
-				continue;
-			}
-
-			instanceFields.add(field);
-		}
-		return instanceFields;
-	}
-
-	/*
-	 * returns all fields that could be used in hashCode and equals
-	 */
-	@Deprecated
-	public static ArrayList<JFieldVar> getRelevantFields(final JDefinedClass implClass) {
-		final ArrayList<JFieldVar> fields = new ArrayList<JFieldVar>();
-		int mods = 0;
-		for (final JFieldVar field : implClass.fields().values()) {
-			mods = field.mods().getValue();
-
-			if ((mods & JMod.PRIVATE) != 0) {
-				continue;
-			}
-			if ((mods & JMod.STATIC) != 0) {
-				continue;
-			}
-
-			if (field.name().contains("Deprecated")) {
-				continue;
-			}
-
-			if (field.type().name().contains("Deprecated")) {
-				continue;
-			}
-			fields.add(field);
-		}
-		return fields;
-	}
-
 	public static boolean isRelevantField(final JFieldVar field) {
-		int mods = field.mods().getValue();
+		final int mods = field.mods().getValue();
 
 		if ((mods & JMod.PRIVATE) != 0) {
 			return false;
@@ -223,12 +151,6 @@ public class Util {
 			return false;
 		}
 
-		// ugly quick fix
-//		if (field.name().equals("link")) {
-//			LOG.info("skip link");
-//			return false;
-//		}
-
 		if (field.name().equals("AbstractObject")) {
 			logInfo("skip abstract object");
 			return false;
@@ -236,7 +158,7 @@ public class Util {
 		return true;
 	}
 
-	public static Collection<JFieldVar> getSuperclassFields(final ClassOutline classOutline, boolean collectionsOnly, boolean checkRequired) {
+	public static Collection<JFieldVar> getSuperclassFields(JCodeModel cm, final ClassOutline classOutline, final boolean collectionsOnly, final boolean checkRequired) {
 		final List<JFieldVar> fieldList = new LinkedList<JFieldVar>();
 		ClassOutline superclass = classOutline.getSuperClass();
 		while (superclass != null) {
@@ -246,21 +168,23 @@ public class Util {
 		}
 
 		// LOG.info("Fields retrieved for superclass of class [" + classOutline.implClass + "] are [" + fieldList + "].");
-
+		for (JFieldVar jFieldVar : fieldList) {
+	    jFieldVar.type(Util.removeJAXBElement(cm, jFieldVar.type()));
+    }
 		return fieldList;
 	}
 
-	public static CPropertyInfo searchPropertyInfo(ClassOutline classOutline, String name) {
+	public static CPropertyInfo searchPropertyInfo(final ClassOutline classOutline, final String name) {
 		CPropertyInfo propertyInfo = classOutline.target.getProperty(name);
 
-		if (propertyInfo == null && classOutline.getSuperClass() != null) {
+		if ((propertyInfo == null) && (classOutline.getSuperClass() != null)) {
 			propertyInfo = searchPropertyInfo(classOutline.getSuperClass(), name);
 		}
 
 		return propertyInfo;
 	}
 
-	public static Collection<JFieldVar> getSuperclassAllFields(final ClassOutline classOutline, boolean collectionsOnly) {
+	public static Collection<JFieldVar> getSuperclassAllFields(final ClassOutline classOutline, final boolean collectionsOnly) {
 		final List<JFieldVar> fieldList = new LinkedList<JFieldVar>();
 		ClassOutline superclass = classOutline.getSuperClass();
 		while (superclass != null) {
@@ -274,18 +198,57 @@ public class Util {
 		return fieldList;
 	}
 
-	public static Collection<JFieldVar> getAllFieldsFields(final ClassOutline classOutline, boolean collectionsOnly) {
+	public static JType removeJAXBElement(JCodeModel cm, final JType jFieldVar) {
+		
+	  final List<JClass> type = jFieldVar.boxify().getTypeParameters();
+	  if (type.size() > 0) {
+	  	JClass clazz = type.get(0);
+	  	if (clazz.fullName().startsWith("javax.xml.bind.JAXBElement<")) {
+//	  		LOG.info("!111>>>>>>>>" + clazz.fullName());
+
+	  		final List<JClass> typeParameters = clazz.getTypeParameters();
+	  		final JClass clazz2 = typeParameters.get(0);
+//	  		LOG.info("!222>>>>>>>>" + clazz2.fullName());
+	  		if (clazz2.fullName().startsWith("? extends")) {
+	  			clazz = clazz2._extends();
+	  			// if (clazz2._extends().fullName().equals("java.lang.Object")) {
+//	  			LOG.info("!333a>>>>>>>" + clazz.fullName());
+	  		} else {
+	  			clazz = clazz2;
+//	  			LOG.info("!333b>>>>>>>" + clazz.fullName());
+	  		}
+	  		if (jFieldVar.fullName().startsWith("java.util.List")) {
+	  			JClass list = cm.ref(List.class);
+	  			LOG.info(">>>>>>> change " + jFieldVar.name() + " -> " + list.narrow(clazz).name() );
+	  			//jFieldVar.type(arrayList.narrow(clazz));
+	  			return list.narrow(clazz);
+	  		} else if (jFieldVar.fullName().startsWith("java.util.Arrayist")) {
+	  			JClass arrayList = cm.ref(ArrayList.class);
+	  			LOG.info(">>>>>>> change " + jFieldVar.name() + " -> " + arrayList.narrow(clazz).name() );
+	  			//jFieldVar.type(arrayList.narrow(clazz));
+	  			return arrayList.narrow(clazz);
+	  		} else {
+	  			LOG.info(">>>>>>> change " + jFieldVar.name() + " -> " + clazz.name());
+	  			//jFieldVar.type(clazz);
+	  			return clazz;
+	  		}
+	  	}
+	  }
+		return jFieldVar;
+  }
+	
+	public static Collection<JFieldVar> getAllFieldsFields(final ClassOutline classOutline, final boolean collectionsOnly) {
 		// LOG.info("Retrieving fields for class [" + classOutline.implClass + "]");
-		Map<String, JFieldVar> fields = classOutline.implClass.fields();
-		Collection<JFieldVar> fieldList = new ArrayList<JFieldVar>();
-		for (FieldOutline fo : classOutline.getDeclaredFields()) {
+		final Map<String, JFieldVar> fields = classOutline.implClass.fields();
+		final Collection<JFieldVar> fieldList = new ArrayList<JFieldVar>();
+		for (final FieldOutline fo : classOutline.getDeclaredFields()) {
 			if (collectionsOnly) {
 				if (!(fo instanceof UntypedListField)) {
 					continue;
 				}
 			}
 			
-			JFieldVar var = fields.get(fo.getPropertyInfo().getName(false));
+			final JFieldVar var = fields.get(fo.getPropertyInfo().getName(false));
 			if (var == null) {
 				continue;
 			}
@@ -299,11 +262,11 @@ public class Util {
 		return fieldList;
 	}
 
-	public static Collection<JFieldVar> getFields(final ClassOutline classOutline, boolean collectionsOnly, boolean checkRequired) {
+	public static Collection<JFieldVar> getFields(final ClassOutline classOutline, final boolean collectionsOnly, final boolean checkRequired) {
 		// LOG.info("Retrieving fields for class [" + classOutline.implClass + "]");
-		Map<String, JFieldVar> fields = classOutline.implClass.fields();
-		Collection<JFieldVar> fieldList = new ArrayList<JFieldVar>();
-		for (FieldOutline fo : classOutline.getDeclaredFields()) {
+		final Map<String, JFieldVar> fields = classOutline.implClass.fields();
+		final Collection<JFieldVar> fieldList = new ArrayList<JFieldVar>();
+		for (final FieldOutline fo : classOutline.getDeclaredFields()) {
 			if (collectionsOnly) {
 				if (!(fo instanceof UntypedListField)) {
 					continue;
@@ -320,7 +283,7 @@ public class Util {
 				}
 			}
 			
-			JFieldVar var = fields.get(fo.getPropertyInfo().getName(false));
+			final JFieldVar var = fields.get(fo.getPropertyInfo().getName(false));
 			if (var == null) {
 				continue;
 			}
@@ -340,16 +303,16 @@ public class Util {
 	// #########################################
 	// #########################################
 
-	public static boolean isFieldMarkedAsRequiredOrMandatoryInXSDSchema(FieldOutline fo) {
-		CPropertyInfo pi = fo.getPropertyInfo();
+	public static boolean isFieldMarkedAsRequiredOrMandatoryInXSDSchema(final FieldOutline fo) {
+		final CPropertyInfo pi = fo.getPropertyInfo();
 		if (pi.getSchemaComponent() instanceof XSParticle) {
-			XSParticle particle = (XSParticle) pi.getSchemaComponent();
+			final XSParticle particle = (XSParticle) pi.getSchemaComponent();
 			if (particle.getMinOccurs() > 0) {
 				// LOG.info("!!! MinOccurs of Element [" + pi.getName(false) + "] is [" + particle.getMinOccurs() + "].");
 			}
 			return particle.getMinOccurs() > 0;
 		} else if (pi.getSchemaComponent() instanceof XSAttributeUse) {
-			XSAttributeUse attributeUse = (XSAttributeUse) pi.getSchemaComponent();
+			final XSAttributeUse attributeUse = (XSAttributeUse) pi.getSchemaComponent();
 			if (attributeUse.isRequired()) {
 				// LOG.info("!!! Required of Attribute [" + pi.getName(false) + "] is [" + attributeUse.isRequired() + "].");
 			}
@@ -364,13 +327,13 @@ public class Util {
 	 * Retrieves a Collection of the fields defined by the given class, excluding all fields defined by its ancestor classes.
 	 */
 	public static Collection<JFieldVar> getConstructorRequiredFields(final ClassOutline classOutline) {
-		Map<String, JFieldVar> fields = classOutline.implClass.fields();
-		Collection<JFieldVar> fieldList = new ArrayList<JFieldVar>();
-		for (FieldOutline fo : classOutline.getDeclaredFields()) {
+		final Map<String, JFieldVar> fields = classOutline.implClass.fields();
+		final Collection<JFieldVar> fieldList = new ArrayList<JFieldVar>();
+		for (final FieldOutline fo : classOutline.getDeclaredFields()) {
 			if (!isFieldMarkedAsRequiredOrMandatoryInXSDSchema(fo)) {
 				continue;
 			}
-			JFieldVar var = fields.get(fo.getPropertyInfo().getName(false));
+			final JFieldVar var = fields.get(fo.getPropertyInfo().getName(false));
 			if (var == null) {
 				continue;
 			}
@@ -384,13 +347,13 @@ public class Util {
 	}
 	
 	public static Map<String, FieldOutline> getRequiredFieldsAsMap(final ClassOutline classOutline) {
-		Map<String, JFieldVar> fields = classOutline.implClass.fields();
-		Map<String, FieldOutline> fieldList = new HashMap<String, FieldOutline>();
-		for (FieldOutline fo : classOutline.getDeclaredFields()) {
+		final Map<String, JFieldVar> fields = classOutline.implClass.fields();
+		final Map<String, FieldOutline> fieldList = new HashMap<String, FieldOutline>();
+		for (final FieldOutline fo : classOutline.getDeclaredFields()) {
 			if (!isFieldMarkedAsRequiredOrMandatoryInXSDSchema(fo)) {
 				continue;
 			}
-			JFieldVar var = fields.get(fo.getPropertyInfo().getName(false));
+			final JFieldVar var = fields.get(fo.getPropertyInfo().getName(false));
 			if (var == null) {
 				continue;
 			}
@@ -403,26 +366,12 @@ public class Util {
 		return fieldList;
 	}
 
-	/*
-	 * check if a superclass exist and if it defines some hashCode- and equals-worthy fields
-	 */
-	@Deprecated
-	public static boolean checkForSuperClass(final ClassOutlineImpl classOutline) {
-		if (classOutline.getSuperClass() == null) {
-			return false;
-		}
 
-		if (Util.getRelevantFields(classOutline.getSuperClass().implClass).size() == 0) {
-			return false;
-		}
 
-		return true;
-	}
-
-	public static void findSubclasses(CClassInfo cc, ArrayList<CClassInfo> listSubclasses) {
-		Iterator<CClassInfo> subclasses = cc.listSubclasses();
+	public static void findSubclasses(final CClassInfo cc, final ArrayList<CClassInfo> listSubclasses) {
+		final Iterator<CClassInfo> subclasses = cc.listSubclasses();
 		while (subclasses.hasNext()) {
-			CClassInfo s = subclasses.next();
+			final CClassInfo s = subclasses.next();
 			if (s.isAbstract()) {
 				findSubclasses(s, listSubclasses);
 				continue;
@@ -431,16 +380,16 @@ public class Util {
 		}
 	}
 
-	public static HashMap<String, ArrayList<CClassInfo>> findSubClasses(Outline outline) {
+	public static HashMap<String, ArrayList<CClassInfo>> findSubClasses(final Outline outline) {
 		// Logger LOG = Logger.getLogger(MoveAbstractClassesInOwnPackage.class.getName());
-		HashMap<String, ArrayList<CClassInfo>> peter = new HashMap<String, ArrayList<CClassInfo>>();
+		final HashMap<String, ArrayList<CClassInfo>> peter = new HashMap<String, ArrayList<CClassInfo>>();
 		logInfo("search for classses with subclasses: ");
 		for (final ClassOutline classOutline : outline.getClasses()) {
-			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
-			String currentClass = Util.eliminateTypeSuffix(cc.target.shortName);
+			final ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
+			final String currentClass = Util.eliminateTypeSuffix(cc.target.shortName);
 
-			StringBuffer sb = new StringBuffer();
-			ArrayList<CClassInfo> listSubclasses = new ArrayList<CClassInfo>();
+			final StringBuffer sb = new StringBuffer();
+			final ArrayList<CClassInfo> listSubclasses = new ArrayList<CClassInfo>();
 			findSubclasses(cc.target, listSubclasses);
 			peter.put(currentClass, listSubclasses);
 
@@ -450,7 +399,7 @@ public class Util {
 				continue;
 			}
 			sb.append("[");
-			for (CClassInfo cClassInfo : listSubclasses) {
+			for (final CClassInfo cClassInfo : listSubclasses) {
 				sb.append(cClassInfo.shortName + ", ");
 			}
 			if (listSubclasses.size() > 0) {

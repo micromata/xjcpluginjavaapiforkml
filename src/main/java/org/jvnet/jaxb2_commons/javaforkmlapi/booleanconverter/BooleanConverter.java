@@ -21,7 +21,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
-import org.jvnet.jaxb2_commons.javaforkmlapi.coordinate.CreateCoordinateClass;
 import org.xml.sax.ErrorHandler;
 
 import com.sun.codemodel.JClass;
@@ -40,28 +39,28 @@ import com.sun.tools.xjc.outline.Outline;
 public class BooleanConverter extends Command {
 	private static final Logger LOG = Logger.getLogger(BooleanConverter.class.getName());
 	
-	public BooleanConverter(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public BooleanConverter(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 		createBooleanConverter(outline);
 	}
 	
 	@SuppressWarnings("restriction")
-  private void createBooleanConverter(Outline outline) {
-		JDefinedClass booleanConverter = pool.getClassBooleanConverter();
+  private void createBooleanConverter(final Outline outline) {
+		final JDefinedClass booleanConverter = pool.getClassBooleanConverter();
 
-		JClass xmladapter = outline.getCodeModel().ref(XmlAdapter.class).narrow(Integer.class).narrow(Boolean.class);
+		final JClass xmladapter = outline.getCodeModel().ref(XmlAdapter.class).narrow(Integer.class).narrow(Boolean.class);
 		booleanConverter._extends(xmladapter);
 		
 		// toString 
-		JMethod unmarshal = booleanConverter.method(JMod.PUBLIC, Boolean.class, "unmarshal");
-		JVar stringConstructorArg = unmarshal.param(JMod.FINAL, Integer.class, "i");
+		final JMethod unmarshal = booleanConverter.method(JMod.PUBLIC, Boolean.class, "unmarshal");
+		final JVar stringConstructorArg = unmarshal.param(JMod.FINAL, Integer.class, "i");
 		unmarshal.annotate(Override.class);
 		unmarshal._throws(Exception.class);
 		unmarshal.body()._return(JOp.cond(stringConstructorArg.eq(JExpr._null()), JExpr._null(), stringConstructorArg.eq(JExpr.lit(1))));
 		
 		// toString
-		JMethod marshal = booleanConverter.method(JMod.PUBLIC, Integer.class, "marshal");
-		JVar unmarshallparam = marshal.param(JMod.FINAL, Boolean.class, "b");
+		final JMethod marshal = booleanConverter.method(JMod.PUBLIC, Integer.class, "marshal");
+		final JVar unmarshallparam = marshal.param(JMod.FINAL, Boolean.class, "b");
 		marshal.annotate(Override.class);
 		marshal._throws(Exception.class);
 		marshal.body()._return(JOp.cond(unmarshallparam.eq(JExpr._null()), JExpr._null(), JOp.cond(unmarshallparam, JExpr.lit(1), JExpr.lit(0))));

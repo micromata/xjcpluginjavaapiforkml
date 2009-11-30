@@ -14,7 +14,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
@@ -50,18 +49,13 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 
 import com.sun.codemodel.ClassType;
-import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JBlock;
-import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
-import com.sun.codemodel.JClassContainer;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JDocComment;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JInvocation;
@@ -71,13 +65,10 @@ import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
-import com.sun.codemodel.JWhileLoop;
 import com.sun.istack.NotNull;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
-import com.sun.tools.xjc.model.nav.NClass;
 import com.sun.tools.xjc.outline.ClassOutline;
-import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 import com.sun.tools.xjc.util.CodeModelClassFactory;
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
@@ -177,7 +168,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 
 	private JType fileNotFoundExceptionClass;
 
-	public CreateMarshalAndUnmarshal(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public CreateMarshalAndUnmarshal(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 	}
 
@@ -185,8 +176,8 @@ public class CreateMarshalAndUnmarshal extends Command {
 	public void execute() {
 		codeModel = outline.getCodeModel();
 		for (final ClassOutline classOutline : outline.getClasses()) {
-			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
-			String currentClassName = Util.eliminateTypeSuffix(cc.implRef.name().toLowerCase());
+			final ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
+			final String currentClassName = Util.eliminateTypeSuffix(cc.implRef.name().toLowerCase());
 			if (currentClassName.equals("kml")) {
 				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " kml class found. creating marshall method");
 
@@ -196,7 +187,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 
 	}
 
-	private void generateMarshallerAndUnMarshaller(ClassOutlineImpl cc) {
+	private void generateMarshallerAndUnMarshaller(final ClassOutlineImpl cc) {
 		jaxbContextClass = codeModel.ref(JAXBContext.class);
 		jaxbExceptionClass = codeModel.ref(JAXBException.class);
 		saxExceptionClass = codeModel.ref(SAXException.class);
@@ -235,151 +226,151 @@ public class CreateMarshalAndUnmarshal extends Command {
 		saxParserFactoryClass = codeModel._ref(SAXParserFactory.class);
 		parserConfigurationExceptionClass = codeModel._ref(ParserConfigurationException.class);
 		
-		CodeModelClassFactory classFactory = outline.getClassFactory();
-		JPackage kmlpackage = Util.getKmlClassPackage(outline);
+		final CodeModelClassFactory classFactory = outline.getClassFactory();
+		final JPackage kmlpackage = Util.getKmlClassPackage(outline);
 		namespaceFilterHandler = classFactory.createClass(kmlpackage, JMod.FINAL, "NamespaceFilterHandler", null, ClassType.CLASS);
 		namespaceFilterHandler._implements(contentHandlerClass.boxify());
-		JFieldVar KML_20 = namespaceFilterHandler.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, stringClass, "KML_20", JExpr.lit("http://earth.google.com/kml/2.0"));
-		JFieldVar KML_21 = namespaceFilterHandler.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, stringClass, "KML_21", JExpr.lit("http://earth.google.com/kml/2.1"));
-		JFieldVar KML_22 = namespaceFilterHandler.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, stringClass, "KML_22", JExpr.lit("http://www.opengis.net/kml/2.2"));
-		JFieldVar content = namespaceFilterHandler.field(JMod.PRIVATE, contentHandlerClass, "contentHandler");
-		JMethod constructor = namespaceFilterHandler.constructor(JMod.PUBLIC);
-		JVar constructorParam = constructor.param(contentHandlerClass, "contentHandler");
+		final JFieldVar KML_20 = namespaceFilterHandler.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, stringClass, "KML_20", JExpr.lit("http://earth.google.com/kml/2.0"));
+		final JFieldVar KML_21 = namespaceFilterHandler.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, stringClass, "KML_21", JExpr.lit("http://earth.google.com/kml/2.1"));
+		final JFieldVar KML_22 = namespaceFilterHandler.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, stringClass, "KML_22", JExpr.lit("http://www.opengis.net/kml/2.2"));
+		final JFieldVar content = namespaceFilterHandler.field(JMod.PRIVATE, contentHandlerClass, "contentHandler");
+		final JMethod constructor = namespaceFilterHandler.constructor(JMod.PUBLIC);
+		final JVar constructorParam = constructor.param(contentHandlerClass, "contentHandler");
 		constructor.body().assign(JExpr._this().ref(content), constructorParam);
 		
-		JMethod startElement = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "startElement");
+		final JMethod startElement = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "startElement");
 		startElement._throws(SAXException.class);
-		JVar uri = startElement.param(stringClass, "uri");
-		JVar localName = startElement.param(stringClass, "localName");
-		JVar qName = startElement.param(stringClass, "qName");
-		JVar atts = startElement.param(Attributes.class, "atts");
-		JConditional if1 = startElement.body()._if(uri.invoke("equals").arg(KML_20).cor(uri.invoke("equals").arg(KML_21)));
+		final JVar uri = startElement.param(stringClass, "uri");
+		final JVar localName = startElement.param(stringClass, "localName");
+		final JVar qName = startElement.param(stringClass, "qName");
+		final JVar atts = startElement.param(Attributes.class, "atts");
+		final JConditional if1 = startElement.body()._if(uri.invoke("equals").arg(KML_20).cor(uri.invoke("equals").arg(KML_21)));
 		if1._then().block().add(content.invoke("startElement").arg(KML_22).arg(localName).arg(qName).arg(atts));
 		if1._else().block().add(content.invoke("startElement").arg(uri).arg(localName).arg(qName).arg(atts));
 		
-		JMethod characters = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "characters");
-		JVar charCh = characters.param(cc.implClass.owner().CHAR.array(), "ch");
-		JVar charStart = characters.param(cc.implClass.owner().INT, "start");
-		JVar charLength = characters.param(cc.implClass.owner().INT, "length");
+		final JMethod characters = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "characters");
+		final JVar charCh = characters.param(cc.implClass.owner().CHAR.array(), "ch");
+		final JVar charStart = characters.param(cc.implClass.owner().INT, "start");
+		final JVar charLength = characters.param(cc.implClass.owner().INT, "length");
 		characters._throws(saxExceptionClass.boxify());
 		characters.body().add(content.invoke("characters").arg(charCh).arg(charStart).arg(charLength));
 		
-		JMethod endDocument = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "endDocument");
+		final JMethod endDocument = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "endDocument");
 		endDocument._throws(saxExceptionClass.boxify());
 		endDocument.body().add(content.invoke("endDocument"));
 		
-		JMethod endElement = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "endElement");
-		JVar endElementUri = endElement.param(stringClass, "uri");
-		JVar endElementLocalName = endElement.param(stringClass, "localName");
-		JVar endElementqName = endElement.param(stringClass, "qName");
+		final JMethod endElement = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "endElement");
+		final JVar endElementUri = endElement.param(stringClass, "uri");
+		final JVar endElementLocalName = endElement.param(stringClass, "localName");
+		final JVar endElementqName = endElement.param(stringClass, "qName");
 		endElement._throws(saxExceptionClass.boxify());
 		endElement.body().add(content.invoke("endElement").arg(endElementUri).arg(endElementLocalName).arg(endElementqName));
 	
-		JMethod endPrefixMapping = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "endPrefixMapping");
-		JVar endPrefixMappingPrefix = endPrefixMapping.param(stringClass, "prefix");
+		final JMethod endPrefixMapping = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "endPrefixMapping");
+		final JVar endPrefixMappingPrefix = endPrefixMapping.param(stringClass, "prefix");
 		endPrefixMapping._throws(saxExceptionClass.boxify());
 		endPrefixMapping.body().add(content.invoke("endPrefixMapping").arg(endPrefixMappingPrefix));
 		
-		JMethod ignorableWhitespace = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "ignorableWhitespace");
-		JVar ignorableWhitespaceCh = ignorableWhitespace.param(cc.implClass.owner().CHAR.array(), "ch");
-		JVar ignorableWhitespaceStart = ignorableWhitespace.param(cc.implClass.owner().INT, "start");
-		JVar ignorableWhitespaceLength = ignorableWhitespace.param(cc.implClass.owner().INT, "length");
+		final JMethod ignorableWhitespace = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "ignorableWhitespace");
+		final JVar ignorableWhitespaceCh = ignorableWhitespace.param(cc.implClass.owner().CHAR.array(), "ch");
+		final JVar ignorableWhitespaceStart = ignorableWhitespace.param(cc.implClass.owner().INT, "start");
+		final JVar ignorableWhitespaceLength = ignorableWhitespace.param(cc.implClass.owner().INT, "length");
 		ignorableWhitespace._throws(saxExceptionClass.boxify());
 		ignorableWhitespace.body().add(content.invoke("ignorableWhitespace").arg(ignorableWhitespaceCh).arg(ignorableWhitespaceStart).arg(ignorableWhitespaceLength));
 		
-		JMethod processingInstruction = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "processingInstruction");
-		JVar processingInstructionTarget = processingInstruction.param(stringClass, "target");
-		JVar processingInstructionData = processingInstruction.param(stringClass, "data");
+		final JMethod processingInstruction = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "processingInstruction");
+		final JVar processingInstructionTarget = processingInstruction.param(stringClass, "target");
+		final JVar processingInstructionData = processingInstruction.param(stringClass, "data");
 		processingInstruction._throws(saxExceptionClass.boxify());
 		processingInstruction.body().add(content.invoke("processingInstruction").arg(processingInstructionTarget).arg(processingInstructionData));
 		
-		JMethod setDocumentLocator = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setDocumentLocator");
-		JVar setDocumentLocatorLocator = setDocumentLocator.param(Locator.class, "locator");
+		final JMethod setDocumentLocator = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setDocumentLocator");
+		final JVar setDocumentLocatorLocator = setDocumentLocator.param(Locator.class, "locator");
 		setDocumentLocator.body().add(content.invoke("setDocumentLocator").arg(setDocumentLocatorLocator));
 		
-		JMethod skippedEntity = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "skippedEntity");
-		JVar skippedEntityName = skippedEntity.param(stringClass, "name");
+		final JMethod skippedEntity = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "skippedEntity");
+		final JVar skippedEntityName = skippedEntity.param(stringClass, "name");
 		skippedEntity._throws(saxExceptionClass.boxify());
 		skippedEntity.body().add(content.invoke("skippedEntity").arg(skippedEntityName));
 		
-		JMethod startDocument = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "startDocument");
+		final JMethod startDocument = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "startDocument");
 		startDocument._throws(saxExceptionClass.boxify());
 		startDocument.body().add(content.invoke("startDocument"));
 		
-		JMethod startPrefixMapping = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "startPrefixMapping");
-		JVar startPrefixMappingPrefix = startPrefixMapping.param(stringClass, "prefix");
-		JVar startPrefixMappingUri = startPrefixMapping.param(stringClass, "uri");
+		final JMethod startPrefixMapping = namespaceFilterHandler.method(JMod.PUBLIC, cc.implClass.owner().VOID, "startPrefixMapping");
+		final JVar startPrefixMappingPrefix = startPrefixMapping.param(stringClass, "prefix");
+		final JVar startPrefixMappingUri = startPrefixMapping.param(stringClass, "uri");
 		startPrefixMapping._throws(saxExceptionClass.boxify());
 		startPrefixMapping.body().add(content.invoke("startPrefixMapping").arg(startPrefixMappingPrefix).arg(startPrefixMappingUri));
 	
 		namespaceFilterXMLReaderclass = classFactory.createClass(kmlpackage, JMod.FINAL, "NamespaceFilterXMLReader", null, ClassType.CLASS);
 		namespaceFilterXMLReaderclass._implements(xmlReaderClass.boxify());
-		JFieldVar xmlReader = namespaceFilterXMLReaderclass.field(JMod.PRIVATE, xmlReaderClass, "xmlReader");
-		JMethod namespaceFilterXMLReaderclassConstrutor = namespaceFilterXMLReaderclass.constructor(JMod.PUBLIC);
-		JVar paramValidate = namespaceFilterXMLReaderclassConstrutor.param(cc.implClass.owner().BOOLEAN, "validate");
+		final JFieldVar xmlReader = namespaceFilterXMLReaderclass.field(JMod.PRIVATE, xmlReaderClass, "xmlReader");
+		final JMethod namespaceFilterXMLReaderclassConstrutor = namespaceFilterXMLReaderclass.constructor(JMod.PUBLIC);
+		final JVar paramValidate = namespaceFilterXMLReaderclassConstrutor.param(cc.implClass.owner().BOOLEAN, "validate");
 		namespaceFilterXMLReaderclassConstrutor._throws(saxExceptionClass.boxify())._throws(parserConfigurationExceptionClass.boxify());
-		JVar parserFactory = namespaceFilterXMLReaderclassConstrutor.body().decl(saxParserFactoryClass, "parserFactory", saxParserFactoryClass.boxify().staticInvoke("newInstance"));
+		final JVar parserFactory = namespaceFilterXMLReaderclassConstrutor.body().decl(saxParserFactoryClass, "parserFactory", saxParserFactoryClass.boxify().staticInvoke("newInstance"));
 		namespaceFilterXMLReaderclassConstrutor.body().add(parserFactory.invoke("setNamespaceAware").arg(JExpr.TRUE));
 		namespaceFilterXMLReaderclassConstrutor.body().add(parserFactory.invoke("setValidating").arg(paramValidate));
 		namespaceFilterXMLReaderclassConstrutor.body().assign(xmlReader, parserFactory.invoke("newSAXParser").invoke("getXMLReader"));
 		
-		JMethod getContentHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, ContentHandler.class, "getContentHandler");
+		final JMethod getContentHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, ContentHandler.class, "getContentHandler");
 		getContentHandler.body()._return(xmlReader.invoke("getContentHandler"));
 		
-		JMethod getDTDHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, DTDHandler.class, "getDTDHandler");
+		final JMethod getDTDHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, DTDHandler.class, "getDTDHandler");
 		getDTDHandler.body()._return(xmlReader.invoke("getDTDHandler"));
 		
-		JMethod getEntityResolver = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, EntityResolver.class, "getEntityResolver");
+		final JMethod getEntityResolver = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, EntityResolver.class, "getEntityResolver");
 		getEntityResolver.body()._return(xmlReader.invoke("getEntityResolver"));
 		
-		JMethod getErrorHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, ErrorHandler.class, "getErrorHandler");
+		final JMethod getErrorHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, ErrorHandler.class, "getErrorHandler");
 		getErrorHandler.body()._return(xmlReader.invoke("getErrorHandler"));
 		
-		JMethod getFeature = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().BOOLEAN, "getFeature");
-		JVar getFeatureName = getFeature.param(stringClass, "name");
+		final JMethod getFeature = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().BOOLEAN, "getFeature");
+		final JVar getFeatureName = getFeature.param(stringClass, "name");
 		getFeature._throws(SAXNotRecognizedException.class)._throws(SAXNotSupportedException.class);
 		getFeature.body()._return(xmlReader.invoke("getFeature").arg(getFeatureName));
 		
-		JMethod getProperty = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, Object.class, "getProperty");
-		JVar getPropertyName = getProperty.param(stringClass, "name");
+		final JMethod getProperty = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, Object.class, "getProperty");
+		final JVar getPropertyName = getProperty.param(stringClass, "name");
 		getProperty._throws(SAXNotRecognizedException.class)._throws(SAXNotSupportedException.class);
 		getProperty.body()._return(xmlReader.invoke("getProperty").arg(getPropertyName));
 		
-		JMethod parse = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "parse");
-		JVar parseInput = parse.param(InputSource.class, "input");
+		final JMethod parse = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "parse");
+		final JVar parseInput = parse.param(InputSource.class, "input");
 		parse._throws(IOException.class)._throws(SAXException.class);
 		parse.body().add(xmlReader.invoke("parse").arg(parseInput));
 		
-		JMethod parse2 = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "parse");
-		JVar parseSystemId = parse2.param(String.class, "systemId");
+		final JMethod parse2 = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "parse");
+		final JVar parseSystemId = parse2.param(String.class, "systemId");
 		parse2._throws(IOException.class)._throws(SAXException.class);
 		parse2.body().add(xmlReader.invoke("parse").arg(parseSystemId));
 		
-		JMethod setContentHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setContentHandler");
-		JVar setContentHandlerHandler = setContentHandler.param(ContentHandler.class, "handler");
+		final JMethod setContentHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setContentHandler");
+		final JVar setContentHandlerHandler = setContentHandler.param(ContentHandler.class, "handler");
 		setContentHandler.body().add(xmlReader.invoke("setContentHandler").arg(JExpr._new(namespaceFilterHandler).arg(setContentHandlerHandler)));
 		
-		JMethod setDTDHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setDTDHandler");
-		JVar setDTDHandlerHandler = setDTDHandler.param(DTDHandler.class, "handler");
+		final JMethod setDTDHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setDTDHandler");
+		final JVar setDTDHandlerHandler = setDTDHandler.param(DTDHandler.class, "handler");
 		setDTDHandler.body().add(xmlReader.invoke("setDTDHandler").arg(setDTDHandlerHandler));
 		
-		JMethod setEntityResolver = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setEntityResolver");
-		JVar setEntityResolverHandler = setEntityResolver.param(EntityResolver.class, "handler");
+		final JMethod setEntityResolver = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setEntityResolver");
+		final JVar setEntityResolverHandler = setEntityResolver.param(EntityResolver.class, "handler");
 		setEntityResolver.body().add(xmlReader.invoke("setEntityResolver").arg(setEntityResolverHandler));
 		
-		JMethod setErrorHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setErrorHandler");
-		JVar setErrorHandlerHandler = setErrorHandler.param(ErrorHandler.class, "handler");
+		final JMethod setErrorHandler = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setErrorHandler");
+		final JVar setErrorHandlerHandler = setErrorHandler.param(ErrorHandler.class, "handler");
 		setErrorHandler.body().add(xmlReader.invoke("setErrorHandler").arg(setErrorHandlerHandler));
 		
-		JMethod setFeature = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setFeature");
-		JVar setFeatureName = setFeature.param(stringClass, "name");
-		JVar setFeatureValue = setFeature.param(cc.implClass.owner().BOOLEAN, "value");
+		final JMethod setFeature = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setFeature");
+		final JVar setFeatureName = setFeature.param(stringClass, "name");
+		final JVar setFeatureValue = setFeature.param(cc.implClass.owner().BOOLEAN, "value");
 		setFeature._throws(SAXNotRecognizedException.class)._throws(SAXNotSupportedException.class);
 		setFeature.body().add(xmlReader.invoke("setFeature").arg(setFeatureName).arg(setFeatureValue));
 		
-		JMethod setProperty = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setProperty");
-		JVar setPropertyName = setProperty.param(stringClass, "name");
-		JVar setPropertyValue = setProperty.param(Object.class, "value");
+		final JMethod setProperty = namespaceFilterXMLReaderclass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "setProperty");
+		final JVar setPropertyName = setProperty.param(stringClass, "name");
+		final JVar setPropertyValue = setProperty.param(Object.class, "value");
 		setProperty._throws(SAXNotRecognizedException.class)._throws(SAXNotSupportedException.class);
 		setProperty.body().add(xmlReader.invoke("setProperty").arg(setPropertyName).arg(setPropertyValue));
 		
@@ -390,7 +381,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 	}
 
 
-	private void generateHelperMethods(ClassOutlineImpl cc) {
+	private void generateHelperMethods(final ClassOutlineImpl cc) {
 		// private static JAXBContext jc = null;
 		jcVar = cc.implClass.field(JMod.PRIVATE | JMod.TRANSIENT, jaxbContextClass, "jc", JExpr._null());
 		// private static Marshaller m = null;
@@ -430,10 +421,10 @@ public class CreateMarshalAndUnmarshal extends Command {
 		createMashaller.body()._return(mVar);
 
 		try {
-			JDefinedClass createNestedPrefixCustomizer = createNestedPrefixCustomizer(cc);
+			final JDefinedClass createNestedPrefixCustomizer = createNestedPrefixCustomizer(cc);
 			ifBlockMarshaller._then().add(
 			    mVar.invoke("setProperty").arg("com.sun.xml.bind.namespacePrefixMapper").arg(JExpr._new(createNestedPrefixCustomizer)));
-		} catch (JClassAlreadyExistsException e) {
+		} catch (final JClassAlreadyExistsException e) {
 		}
 
 		// private Unmarshaller createUnmarshaller() throws JAXBException {
@@ -451,7 +442,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 		createAddToKmzFile(cc);
 	}
 
-	private void createAddToKmzFile(ClassOutlineImpl cc) {
+	private void createAddToKmzFile(final ClassOutlineImpl cc) {
 	  // private void addKmzFile(Kml kmzFile, ZipOutputStream out, boolean mainfile) throws IOException {
 		// String fileName = null;
 		// if (kmzFile.getFeature() == null || kmzFile.getFeature().getName() == null || kmzFile.getFeature().getName().length() == 0) {
@@ -473,12 +464,12 @@ public class CreateMarshalAndUnmarshal extends Command {
 		//  	
 		createAddToKmzFile = cc.implClass.method(JMod.PRIVATE, cc.implClass.owner().VOID, "addKmzFile");
 		createAddToKmzFile._throws(IOException.class);
-		JVar varKmzFile = createAddToKmzFile.param(kmlClass, "kmzFile");
-		JVar varOut = createAddToKmzFile.param(zipOutputStreamClass, "out");
-		JVar varMainFile = createAddToKmzFile.param(cc.implClass.owner().BOOLEAN, "mainfile");
+		final JVar varKmzFile = createAddToKmzFile.param(kmlClass, "kmzFile");
+		final JVar varOut = createAddToKmzFile.param(zipOutputStreamClass, "out");
+		final JVar varMainFile = createAddToKmzFile.param(cc.implClass.owner().BOOLEAN, "mainfile");
 		createAddToKmzFile.javadoc().add("Internal method");
-		JVar varFileName = createAddToKmzFile.body().decl(stringClass, "fileName", JExpr._null());
-		JConditional if1 = createAddToKmzFile.body()._if(
+		final JVar varFileName = createAddToKmzFile.body().decl(stringClass, "fileName", JExpr._null());
+		final JConditional if1 = createAddToKmzFile.body()._if(
 		    varKmzFile.invoke("getFeature").eq(JExpr._null()).cor(varKmzFile.invoke("getFeature").invoke("getName").eq(JExpr._null())).cor(
 		        varKmzFile.invoke("getFeature").invoke("getName").invoke("length").eq(JExpr.lit(0))));
 		if1._then().assign(varFileName, JExpr.lit("noFeatureNameSet").plus(varMissingNameCounter.incr()).plus(JExpr.lit(".kml")));
@@ -493,11 +484,11 @@ public class CreateMarshalAndUnmarshal extends Command {
 		createAddToKmzFile.body().add(varOut.invoke("closeEntry"));
   }
 
-	private JDefinedClass createNestedPrefixCustomizer(ClassOutlineImpl cc) throws JClassAlreadyExistsException {
-		JDefinedClass namespacebeautyfier = cc.implClass._class(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, "NameSpaceBeautyfier");
+	private JDefinedClass createNestedPrefixCustomizer(final ClassOutlineImpl cc) throws JClassAlreadyExistsException {
+		final JDefinedClass namespacebeautyfier = cc.implClass._class(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, "NameSpaceBeautyfier");
 		namespacebeautyfier._extends(NamespacePrefixMapper.class);
 
-		JMethod namespacebeautyfiergetpreferredprefix = namespacebeautyfier.method(JMod.PUBLIC, stringClass, "getPreferredPrefix");
+		final JMethod namespacebeautyfiergetpreferredprefix = namespacebeautyfier.method(JMod.PUBLIC, stringClass, "getPreferredPrefix");
 		namespacebeautyfiergetpreferredprefix.annotate(Override.class);
 		namespacebeautyfiergetpreferredprefix.javadoc().append("Internal method!\n");
 		namespacebeautyfiergetpreferredprefix.javadoc().append(
@@ -519,7 +510,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 
 		namespacebeautyfiergetpreferredprefix.javadoc().append("<p>namespaceUri: anything else prefix: null</p>");
 		namespacebeautyfiergetpreferredprefix.javadoc().trimToSize();
-		JVar namespaceuri = namespacebeautyfiergetpreferredprefix.param(stringClass, "namespaceUri");
+		final JVar namespaceuri = namespacebeautyfiergetpreferredprefix.param(stringClass, "namespaceUri");
 		namespacebeautyfiergetpreferredprefix.param(stringClass, "suggestion");
 		namespacebeautyfiergetpreferredprefix.param(cc.implClass.owner().BOOLEAN, "requirePrefix");
 
@@ -564,8 +555,8 @@ public class CreateMarshalAndUnmarshal extends Command {
 	 * 
 	 * @param cc
 	 */
-	private void generateMarshalMethods(ClassOutlineImpl cc) {
-		ArrayList<String> comment = new ArrayList<String>();
+	private void generateMarshalMethods(final ClassOutlineImpl cc) {
+		final ArrayList<String> comment = new ArrayList<String>();
 		comment.add("Java to KML\n");
 		comment.add("The object graph is marshalled to an OutputStream object.\n");
 		comment.add("The object is not saved as a zipped .kmz file.\n");
@@ -626,7 +617,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 
 		final JVar filenameVar = generateMarshallFilenameWithZIP.param(JMod.FINAL, File.class, "filename");
 		// final JVar zippedVar = generateMarshallFilenameWithZIP.param(JMod.FINAL, boolean.class, "zipped");
-		JVar outVar = generateMarshallFilenameWithZIP.body().decl(outputStreamClass, "out", JExpr._new(fileOutputStreamClass).arg(filenameVar));
+		final JVar outVar = generateMarshallFilenameWithZIP.body().decl(outputStreamClass, "out", JExpr._new(fileOutputStreamClass).arg(filenameVar));
 		// final JConditional ifBlockFilename = generateMarshallFilenameWithZIP.body()._if(zippedVar.eq(JExpr.TRUE));
 		// ifBlockFilename._then().assign(outVar, JExpr._new(zipOutputStreamClass).arg(outVar));
 		generateMarshallFilenameWithZIP.body()._return(JExpr._this().invoke(generateMarshalOutputStream).arg(outVar));
@@ -649,13 +640,13 @@ public class CreateMarshalAndUnmarshal extends Command {
 
 
 
-	private JMethod generateMarshal(ClassOutlineImpl cc, ArrayList<String> comment) {
+	private JMethod generateMarshal(final ClassOutlineImpl cc, final ArrayList<String> comment) {
 		// public boolean marshall(final String filename) throws FileNotFoundException {
 		final JMethod generateMarshalOutputStream = cc.implClass.method(JMod.PUBLIC, cc.implClass.owner().BOOLEAN, "marshal");
 		generateMarshalOutputStream.javadoc().append(comment);
 
 		// try {
-		JTryBlock tryBlock = generateMarshalOutputStream.body()._try();
+		final JTryBlock tryBlock = generateMarshalOutputStream.body()._try();
 		// m = this.createMarshaller();
 		tryBlock.body().assign(mVar, JExpr._this().invoke(createMashaller));
 
@@ -671,13 +662,13 @@ public class CreateMarshalAndUnmarshal extends Command {
 		tryBlock.body()._return(JExpr.TRUE);
 
 		// } catch (JAXBException _x) {
-		JBlock catchBlock = tryBlock._catch(jaxbExceptionClass.boxify()).body();
+		final JBlock catchBlock = tryBlock._catch(jaxbExceptionClass.boxify()).body();
 		catchBlock.directStatement("_x.printStackTrace();");
 		catchBlock._return(JExpr.FALSE);
 		return generateMarshalOutputStream;
 	}
 
-	private JMethod generateMarshal(ClassOutlineImpl cc, JType argumentType, ArrayList<String> comment) {
+	private JMethod generateMarshal(final ClassOutlineImpl cc, final JType argumentType, final ArrayList<String> comment) {
 		// public boolean marshall(final String filename) throws FileNotFoundException {
 		final JMethod generateMarshalOutputStream = cc.implClass.method(JMod.PUBLIC, cc.implClass.owner().BOOLEAN, "marshal");
 		if (argumentType.equals(outputStreamClass)) {
@@ -687,7 +678,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 		final JVar value = generateMarshalOutputStream.param(JMod.FINAL, argumentType, argumentType.name().toLowerCase());
 
 		// try {
-		JTryBlock tryBlock = generateMarshalOutputStream.body()._try();
+		final JTryBlock tryBlock = generateMarshalOutputStream.body()._try();
 		// m = this.createMarshaller();
 		tryBlock.body().assign(mVar, JExpr._this().invoke(createMashaller));
 
@@ -703,13 +694,13 @@ public class CreateMarshalAndUnmarshal extends Command {
 		tryBlock.body()._return(JExpr.TRUE);
 
 		// } catch (JAXBException _x) {
-		JBlock catchBlock = tryBlock._catch(jaxbExceptionClass.boxify()).body();
+		final JBlock catchBlock = tryBlock._catch(jaxbExceptionClass.boxify()).body();
 		catchBlock.directStatement("_x.printStackTrace();");
 		catchBlock._return(JExpr.FALSE);
 		return generateMarshalOutputStream;
 	}
 
-	private void generateUnMarshalMethods(ClassOutlineImpl cc) {
+	private void generateUnMarshalMethods(final ClassOutlineImpl cc) {
 		schemaLocationVar = cc.implClass.field(JMod.PRIVATE | JMod.STATIC | JMod.FINAL, stringClass, "SCHEMA_LOCATION", JExpr
 		    .lit("src/main/resources/schema/ogckml/ogckml22.xsd"));
 
@@ -745,7 +736,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 	 * 	return null;
 	 * }
 	 */
-	private void generateUnmarshalLegacyKmlMethod(ClassOutlineImpl cc) {
+	private void generateUnmarshalLegacyKmlMethod(final ClassOutlineImpl cc) {
 		final JMethod generateUnMarshallerFromString = cc.implClass.method(JMod.PUBLIC | JMod.STATIC, kmlClass, "unmarshalLegacyKml");
 		generateUnMarshallerFromString.javadoc().add("KML to Java\n");
 		generateUnMarshallerFromString.javadoc().add("reads legacy kml files. \n");
@@ -755,13 +746,13 @@ public class CreateMarshalAndUnmarshal extends Command {
 		
 		final JVar fileunmarshallVar = generateUnMarshallerFromString.param(JMod.FINAL, fileClass, "file");
 		generateUnMarshallerFromString._throws(FileNotFoundException.class);
-		JTryBlock tryBlock = generateUnMarshallerFromString.body()._try();
-		JVar localUnmarshallerFile = tryBlock.body().decl(jaxbUnmarshallerClass, "unmarshaller",
+		final JTryBlock tryBlock = generateUnMarshallerFromString.body()._try();
+		final JVar localUnmarshallerFile = tryBlock.body().decl(jaxbUnmarshallerClass, "unmarshaller",
 		    jaxbContextClass.boxify().staticInvoke("newInstance").arg(JExpr.direct("Kml.class")).invoke("createUnmarshaller"));
 		
-		JVar inputsource = tryBlock.body().decl(inputsourceClass, "input", JExpr._new(inputsourceClass).arg(JExpr._new(fileReaderClass).arg(fileunmarshallVar)));
-		JVar saxsource = tryBlock.body().decl(saxsourceClass, "saxSource", JExpr._new(saxsourceClass).arg(JExpr._new(namespaceFilterXMLReaderclass).arg(JExpr.FALSE)).arg(inputsource));
-		JVar decl = tryBlock.body().decl(kmlClass, "jaxbRootElement", JExpr.cast(kmlClass, JExpr.invoke(localUnmarshallerFile, "unmarshal").arg(saxsource)));
+		final JVar inputsource = tryBlock.body().decl(inputsourceClass, "input", JExpr._new(inputsourceClass).arg(JExpr._new(fileReaderClass).arg(fileunmarshallVar)));
+		final JVar saxsource = tryBlock.body().decl(saxsourceClass, "saxSource", JExpr._new(saxsourceClass).arg(JExpr._new(namespaceFilterXMLReaderclass).arg(JExpr.FALSE)).arg(inputsource));
+		final JVar decl = tryBlock.body().decl(kmlClass, "jaxbRootElement", JExpr.cast(kmlClass, JExpr.invoke(localUnmarshallerFile, "unmarshal").arg(saxsource)));
 		tryBlock.body()._return(decl);
 		tryBlock._catch(saxExceptionClass.boxify()).body().directStatement("_x.printStackTrace();");
 		tryBlock._catch(parserConfigurationExceptionClass.boxify()).body().directStatement("_x.printStackTrace();");
@@ -795,7 +786,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 
 			String entryName = URLDecoder.decode(entry.getName(), "UTF-8");
 
-			System.out.println("element: " + entryName);
+			LOG.info("element: " + entryName);
 			if (!entry.getName().endsWith(".kml")) {
 				continue;
 			}
@@ -809,27 +800,27 @@ public class CreateMarshalAndUnmarshal extends Command {
 	}
 	</code></pre>
   */
-	private void generateUnmarshalFromKmzMethod(ClassOutlineImpl cc) {
+	private void generateUnmarshalFromKmzMethod(final ClassOutlineImpl cc) {
 		final JMethod unmarshalFromKMZ = cc.implClass.method(JMod.PUBLIC | JMod.STATIC, kmlClass.array(), "unmarshalFromKmz");
 		unmarshalFromKMZ.javadoc().add("KMZ to Java\n");
 		unmarshalFromKMZ.javadoc().add("Similar to the other unmarshal methods\n\n");
 		unmarshalFromKMZ.javadoc().add("with the exception that it transforms a KMZ-file into a graph of Java objects. \n");	
 		unmarshalFromKMZ._throws(IOException.class);
-		JVar varFile = unmarshalFromKMZ.param(fileClass, "file");
+		final JVar varFile = unmarshalFromKMZ.param(fileClass, "file");
 		varFile.annotate(NotNull.class);
-		JVar varEMPTY_KML_ARRAY = unmarshalFromKMZ.body().decl(kmlClass.array(), "EMPTY_KML_ARRAY", JExpr.direct("new Kml[0]"));// JExpr._new(kmlClass.array().)..arg("0"));
+		final JVar varEMPTY_KML_ARRAY = unmarshalFromKMZ.body().decl(kmlClass.array(), "EMPTY_KML_ARRAY", JExpr.direct("new Kml[0]"));// JExpr._new(kmlClass.array().)..arg("0"));
 		unmarshalFromKMZ.body()._if(varFile.invoke("getName").invoke("endsWith").arg(".kmz").not())._then()._return(varEMPTY_KML_ARRAY);
-		JVar varZip = unmarshalFromKMZ.body().decl(zipFileClass, "zip",JExpr._new(zipFileClass).arg(varFile) );
-		JVar varEntries = unmarshalFromKMZ.body().decl(enumerationClass.boxify().narrow(zipEntryClass.boxify().wildcard()), "entries", varZip.invoke("entries"));
+		final JVar varZip = unmarshalFromKMZ.body().decl(zipFileClass, "zip",JExpr._new(zipFileClass).arg(varFile) );
+		final JVar varEntries = unmarshalFromKMZ.body().decl(enumerationClass.boxify().narrow(zipEntryClass.boxify().wildcard()), "entries", varZip.invoke("entries"));
 		unmarshalFromKMZ.body()._if(varFile.invoke("exists").not())._then()._return(varEMPTY_KML_ARRAY);
-		JVar varKmlFiles = unmarshalFromKMZ.body().decl(arrayListClass.boxify().narrow(kmlClass.boxify()), "kmlfiles", JExpr._new(arrayListClass.boxify().narrow(kmlClass.boxify())));
-		JBlock while1 = unmarshalFromKMZ.body()._while(varEntries.invoke("hasMoreElements")).body();
-		JVar varEntry = while1.decl(zipEntryClass, "entry",JExpr.cast(zipEntryClass, varEntries.invoke("nextElement")));
+		final JVar varKmlFiles = unmarshalFromKMZ.body().decl(arrayListClass.boxify().narrow(kmlClass.boxify()), "kmlfiles", JExpr._new(arrayListClass.boxify().narrow(kmlClass.boxify())));
+		final JBlock while1 = unmarshalFromKMZ.body()._while(varEntries.invoke("hasMoreElements")).body();
+		final JVar varEntry = while1.decl(zipEntryClass, "entry",JExpr.cast(zipEntryClass, varEntries.invoke("nextElement")));
 		while1._if(varEntry.invoke("getName").invoke("contains").arg("__MACOSX").cor(varEntry.invoke("getName").invoke("contains").arg(".DS_STORE")))._then()._continue();
-		JVar entryName = while1.decl(stringClass, "entryName", urlDecoderClass.boxify().staticInvoke("decode").arg(varEntry.invoke("getName")).arg("UTF-8"));
+		final JVar entryName = while1.decl(stringClass, "entryName", urlDecoderClass.boxify().staticInvoke("decode").arg(varEntry.invoke("getName")).arg("UTF-8"));
 		while1._if(entryName.invoke("endsWith").arg(".kml").not())._then()._continue();
-		JVar varIn = while1.decl(inputStreamClass, "in", varZip.invoke("getInputStream").arg(varEntry));
-		JVar varUnmarshal = while1.decl(kmlClass, "unmarshal", kmlClass.boxify().staticInvoke("unmarshal").arg(varIn));
+		final JVar varIn = while1.decl(inputStreamClass, "in", varZip.invoke("getInputStream").arg(varEntry));
+		final JVar varUnmarshal = while1.decl(kmlClass, "unmarshal", kmlClass.boxify().staticInvoke("unmarshal").arg(varIn));
 		while1.add(varKmlFiles.invoke("add").arg(varUnmarshal));
 		unmarshalFromKMZ.body().add(varZip.invoke("close"));
 		unmarshalFromKMZ.body()._return(varKmlFiles.invoke("toArray").arg(varEMPTY_KML_ARRAY));
@@ -838,7 +829,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 		
   }
 	
-	private void generateMarshalKmz(ClassOutlineImpl cc) {
+	private void generateMarshalKmz(final ClassOutlineImpl cc) {
 		// public boolean marshalKmz(@NotNull String name, Kml... additionalFiles) throws IOException {
 		// ZipOutputStream out = new ZipOutputStream(new FileOutputStream(name));
 		// out.setComment("KMZ-file created with Java API for KML.");
@@ -853,21 +844,21 @@ public class CreateMarshalAndUnmarshal extends Command {
 		// return false;
 		// }
 		final JMethod generateMarshalKmz = cc.implClass.method(JMod.PUBLIC, cc.implClass.owner().BOOLEAN, "marshalAsKmz");
-		JVar varName = generateMarshalKmz.param(stringClass, "name");
+		final JVar varName = generateMarshalKmz.param(stringClass, "name");
 		varName.annotate(NotNull.class);
-		JVar varAdditionalFiles = generateMarshalKmz.varParam(kmlClass.boxify(), "additionalFiles");
+		final JVar varAdditionalFiles = generateMarshalKmz.varParam(kmlClass.boxify(), "additionalFiles");
 		generateMarshalKmz._throws(IOException.class);
-		JVar varOut = generateMarshalKmz.body().decl(zipOutputStreamClass, "out", JExpr._new(zipOutputStreamClass).arg(JExpr._new(fileOutputStreamClass).arg(varName)));
+		final JVar varOut = generateMarshalKmz.body().decl(zipOutputStreamClass, "out", JExpr._new(zipOutputStreamClass).arg(JExpr._new(fileOutputStreamClass).arg(varName)));
 		generateMarshalKmz.body().add(varOut.invoke("setComment").arg("KMZ-file created with Java API for KML. Visit us: http://code.google.com/p/javaapiforkml/"));
 		generateMarshalKmz.body().add(JExpr._this().invoke(createAddToKmzFile).arg(JExpr._this()).arg(varOut).arg(JExpr.TRUE));
-		JForEach forEach = generateMarshalKmz.body().forEach(kmlClass, "kml", varAdditionalFiles);
+		final JForEach forEach = generateMarshalKmz.body().forEach(kmlClass, "kml", varAdditionalFiles);
 		forEach.body().add(JExpr._this().invoke(createAddToKmzFile).arg(forEach.var()).arg(varOut).arg(JExpr.FALSE));
 		generateMarshalKmz.body().add(varOut.invoke("close"));
 		generateMarshalKmz.body().assign(varMissingNameCounter,JExpr.lit(1));
 		generateMarshalKmz.body()._return(JExpr.FALSE);
 	}
 
-	private void generateUnmarshalMethodPlain(ClassOutlineImpl cc, JClass invokeMarshalWith) {
+	private void generateUnmarshalMethodPlain(final ClassOutlineImpl cc, final JClass invokeMarshalWith) {
 		final JMethod generateUnMarshallerFromString = cc.implClass.method(JMod.PUBLIC | JMod.STATIC, kmlClass, "unmarshal");
 		generateUnMarshallerFromString.javadoc().add("KML to Java\n");
 		generateUnMarshallerFromString.javadoc().add("Similar to the other unmarshal methods \n\n");
@@ -876,13 +867,13 @@ public class CreateMarshalAndUnmarshal extends Command {
 		generateUnMarshallerFromString.javadoc().trimToSize();
 		final JVar stringunmarshallVar = generateUnMarshallerFromString.param(JMod.FINAL, invokeMarshalWith, "content");
 
-		JTryBlock tryStringBlock = generateUnMarshallerFromString.body()._try();
-		JVar localUnmarshaller = tryStringBlock.body().decl(jaxbUnmarshallerClass, "unmarshaller",
+		final JTryBlock tryStringBlock = generateUnMarshallerFromString.body()._try();
+		final JVar localUnmarshaller = tryStringBlock.body().decl(jaxbUnmarshallerClass, "unmarshaller",
 		    jaxbContextClass.boxify().staticInvoke("newInstance").arg(JExpr.direct("Kml.class")).invoke("createUnmarshaller"));
 		
-		JVar inputsource = tryStringBlock.body().decl(inputsourceClass, "input", JExpr._new(inputsourceClass).arg(stringunmarshallVar));
-		JVar saxsource = tryStringBlock.body().decl(saxsourceClass, "saxSource", JExpr._new(saxsourceClass).arg(JExpr._new(namespaceFilterXMLReaderclass).arg(JExpr.FALSE)).arg(inputsource));
-		JVar decl = tryStringBlock.body().decl(kmlClass, "jaxbRootElement", JExpr.cast(kmlClass, JExpr.invoke(localUnmarshaller, "unmarshal").arg(saxsource)));
+		final JVar inputsource = tryStringBlock.body().decl(inputsourceClass, "input", JExpr._new(inputsourceClass).arg(stringunmarshallVar));
+		final JVar saxsource = tryStringBlock.body().decl(saxsourceClass, "saxSource", JExpr._new(saxsourceClass).arg(JExpr._new(namespaceFilterXMLReaderclass).arg(JExpr.FALSE)).arg(inputsource));
+		final JVar decl = tryStringBlock.body().decl(kmlClass, "jaxbRootElement", JExpr.cast(kmlClass, JExpr.invoke(localUnmarshaller, "unmarshal").arg(saxsource)));
 		tryStringBlock.body()._return(decl);
 		tryStringBlock._catch(saxExceptionClass.boxify()).body().directStatement("_x.printStackTrace();");
 		tryStringBlock._catch(parserConfigurationExceptionClass.boxify()).body().directStatement("_x.printStackTrace();");
@@ -890,7 +881,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 		generateUnMarshallerFromString.body()._return(JExpr._null());		
 	}
 
-	private void generateUnmarshalMethodFromString(ClassOutlineImpl cc, JType invokeMarshalWith) {
+	private void generateUnmarshalMethodFromString(final ClassOutlineImpl cc, final JType invokeMarshalWith) {
 		final JMethod generateUnMarshallerFromString = cc.implClass.method(JMod.PUBLIC | JMod.STATIC, kmlClass, "unmarshal");
 		generateUnMarshallerFromString.javadoc().add("KML to Java\n");
 		generateUnMarshallerFromString.javadoc().add("Similar to the other unmarshal methods \n\n");
@@ -898,13 +889,13 @@ public class CreateMarshalAndUnmarshal extends Command {
 		generateUnMarshallerFromString.javadoc().trimToSize();
 		final JVar stringunmarshallVar = generateUnMarshallerFromString.param(JMod.FINAL, stringClass, "content");
 
-		JTryBlock tryStringBlock = generateUnMarshallerFromString.body()._try();
-		JVar localUnmarshaller = tryStringBlock.body().decl(jaxbUnmarshallerClass, "unmarshaller",
+		final JTryBlock tryStringBlock = generateUnMarshallerFromString.body()._try();
+		final JVar localUnmarshaller = tryStringBlock.body().decl(jaxbUnmarshallerClass, "unmarshaller",
 		    jaxbContextClass.boxify().staticInvoke("newInstance").arg(JExpr.direct("Kml.class")).invoke("createUnmarshaller"));
 		
-		JVar inputsource = tryStringBlock.body().decl(inputsourceClass, "input", JExpr._new(inputsourceClass).arg(JExpr._new(stringReaderClass).arg(stringunmarshallVar)));
-		JVar saxsource = tryStringBlock.body().decl(saxsourceClass, "saxSource", JExpr._new(saxsourceClass).arg(JExpr._new(namespaceFilterXMLReaderclass).arg(JExpr.FALSE)).arg(inputsource));
-		JVar decl = tryStringBlock.body().decl(kmlClass, "jaxbRootElement", JExpr.cast(kmlClass, JExpr.invoke(localUnmarshaller, "unmarshal").arg(saxsource)));
+		final JVar inputsource = tryStringBlock.body().decl(inputsourceClass, "input", JExpr._new(inputsourceClass).arg(JExpr._new(stringReaderClass).arg(stringunmarshallVar)));
+		final JVar saxsource = tryStringBlock.body().decl(saxsourceClass, "saxSource", JExpr._new(saxsourceClass).arg(JExpr._new(namespaceFilterXMLReaderclass).arg(JExpr.FALSE)).arg(inputsource));
+		final JVar decl = tryStringBlock.body().decl(kmlClass, "jaxbRootElement", JExpr.cast(kmlClass, JExpr.invoke(localUnmarshaller, "unmarshal").arg(saxsource)));
 		tryStringBlock.body()._return(decl);
 		tryStringBlock._catch(saxExceptionClass.boxify()).body().directStatement("_x.printStackTrace();");
 		tryStringBlock._catch(parserConfigurationExceptionClass.boxify()).body().directStatement("_x.printStackTrace();");
@@ -912,7 +903,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 		generateUnMarshallerFromString.body()._return(JExpr._null());		
 	}
 
-	private void generateUnmarshalFileWithOptionalValidate(ClassOutlineImpl cc, final JMethod generateValidate) {
+	private void generateUnmarshalFileWithOptionalValidate(final ClassOutlineImpl cc, final JMethod generateValidate) {
 		final JMethod generateUnMarshallerFileFile = cc.implClass.method(JMod.PUBLIC | JMod.STATIC, kmlClass, "unmarshal");
 		generateUnMarshallerFileFile.javadoc().add("KML to Java\n");
 		generateUnMarshallerFileFile.javadoc().add("KML given as a file object is transformed into a graph of Java objects.\n");
@@ -923,16 +914,16 @@ public class CreateMarshalAndUnmarshal extends Command {
 		final JVar fileunmarshallVar = generateUnMarshallerFileFile.param(JMod.FINAL, fileClass, "file");
 		final JVar validateVar = generateUnMarshallerFileFile.param(JMod.FINAL, boolean.class, "validate");
 
-		JTryBlock tryBlock = generateUnMarshallerFileFile.body()._try();
-		JVar localUnmarshallerFile = tryBlock.body().decl(jaxbUnmarshallerClass, "unmarshaller",
+		final JTryBlock tryBlock = generateUnMarshallerFileFile.body()._try();
+		final JVar localUnmarshallerFile = tryBlock.body().decl(jaxbUnmarshallerClass, "unmarshaller",
 		    jaxbContextClass.boxify().staticInvoke("newInstance").arg(JExpr.direct("Kml.class")).invoke("createUnmarshaller"));
 
 		final JConditional ifBlockFilename = tryBlock.body()._if(validateVar.eq(JExpr.TRUE));
 		ifBlockFilename._then().add(kmlClass.boxify().staticInvoke(generateValidate).arg(localUnmarshallerFile));
 		
-		JVar inputsource = tryBlock.body().decl(inputsourceClass, "input", JExpr._new(inputsourceClass).arg(JExpr._new(fileReaderClass).arg(fileunmarshallVar)));
-		JVar saxsource = tryBlock.body().decl(saxsourceClass, "saxSource", JExpr._new(saxsourceClass).arg(JExpr._new(namespaceFilterXMLReaderclass).arg(validateVar)).arg(inputsource));
-		JVar decl = tryBlock.body().decl(kmlClass, "jaxbRootElement", JExpr.cast(kmlClass, JExpr.invoke(localUnmarshallerFile, "unmarshal").arg(saxsource)));
+		final JVar inputsource = tryBlock.body().decl(inputsourceClass, "input", JExpr._new(inputsourceClass).arg(JExpr._new(fileReaderClass).arg(fileunmarshallVar)));
+		final JVar saxsource = tryBlock.body().decl(saxsourceClass, "saxSource", JExpr._new(saxsourceClass).arg(JExpr._new(namespaceFilterXMLReaderclass).arg(validateVar)).arg(inputsource));
+		final JVar decl = tryBlock.body().decl(kmlClass, "jaxbRootElement", JExpr.cast(kmlClass, JExpr.invoke(localUnmarshallerFile, "unmarshal").arg(saxsource)));
 		tryBlock.body()._return(decl);
 		tryBlock._catch(saxExceptionClass.boxify()).body().directStatement("_x.printStackTrace();");
 		tryBlock._catch(parserConfigurationExceptionClass.boxify()).body().directStatement("_x.printStackTrace();");
@@ -952,17 +943,17 @@ public class CreateMarshalAndUnmarshal extends Command {
 		    kmlClass.boxify().staticInvoke(generateUnMarshallerFileFile).arg(fileunmarshallVar).arg(JExpr.FALSE));
 	}
 
-	private JMethod generateValidateMethod(ClassOutlineImpl cc) {
+	private JMethod generateValidateMethod(final ClassOutlineImpl cc) {
 		final JMethod generateValidate = cc.implClass.method(JMod.PRIVATE | JMod.STATIC, cc.implClass.owner().BOOLEAN, "validate");
 		final JVar unmarshallValidateVar = generateValidate.param(JMod.FINAL, jaxbUnmarshallerClass, "unmarshaller");
-		JTryBlock tryValidateBlock = generateValidate.body()._try();
-		JVar schemaFactoryVar = tryValidateBlock.body().decl(schemaFactoryClass, "sf",
+		final JTryBlock tryValidateBlock = generateValidate.body()._try();
+		final JVar schemaFactoryVar = tryValidateBlock.body().decl(schemaFactoryClass, "sf",
 		    schemaFactoryClass.boxify().staticInvoke("newInstance").arg(xmlConstantsClass.boxify().staticRef("W3C_XML_SCHEMA_NS_URI")));
-		JVar schemaFileVar = tryValidateBlock.body().decl(fileClass, "schemaFile", JExpr._new(fileClass).arg(schemaLocationVar));
-		JVar schemaVar = tryValidateBlock.body().decl(schemaClass, "schema", schemaFactoryVar.invoke("newSchema").arg(schemaFileVar));
+		final JVar schemaFileVar = tryValidateBlock.body().decl(fileClass, "schemaFile", JExpr._new(fileClass).arg(schemaLocationVar));
+		final JVar schemaVar = tryValidateBlock.body().decl(schemaClass, "schema", schemaFactoryVar.invoke("newSchema").arg(schemaFileVar));
 		tryValidateBlock.body().add(unmarshallValidateVar.invoke("setSchema").arg(schemaVar));
 		tryValidateBlock.body()._return(JExpr.TRUE);
-		JBlock catchValidateBlock = tryValidateBlock._catch(saxExceptionClass.boxify()).body();
+		final JBlock catchValidateBlock = tryValidateBlock._catch(saxExceptionClass.boxify()).body();
 		catchValidateBlock.directStatement("_x.printStackTrace();");
 		generateValidate.body()._return(JExpr.FALSE);
 		return generateValidate;
@@ -971,7 +962,7 @@ public class CreateMarshalAndUnmarshal extends Command {
 	/**
 	 * Generates an expression that evaluates to "new QName(...)"
 	 */
-	private JInvocation createQName(String packageUri, String name) {
+	private JInvocation createQName(final String packageUri, final String name) {
 		return JExpr._new(codeModel.ref(QName.class)).arg(packageUri).arg(name);
 	}
 }

@@ -12,7 +12,7 @@ public class JaxbJavaDoc {
 		return className;
 	}
 
-	public void setClassName(String className) {
+	public void setClassName(final String className) {
 		this.className = className;
 	}
 
@@ -20,7 +20,7 @@ public class JaxbJavaDoc {
 		return javaDoc;
 	}
 
-	public void setJavaDoc(String javaDoc) {
+	public void setJavaDoc(final String javaDoc) {
 		this.javaDoc = javaDoc;
 	}
 

@@ -1,15 +1,11 @@
 package org.jvnet.jaxb2_commons.javaforkmlapi.equals_hashcode;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
 import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
 
 import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
@@ -20,7 +16,6 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
 import com.sun.codemodel.JOp;
-import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
@@ -38,7 +33,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class CreateEqualsAndHashCode extends Command {
 	private static final Logger LOG = Logger.getLogger(CreateEqualsAndHashCode.class.getName());
 
-	public CreateEqualsAndHashCode(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public CreateEqualsAndHashCode(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 	}
 

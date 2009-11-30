@@ -36,7 +36,7 @@ public class JavaAPIPrologCodeWriter extends PrologCodeWriter {
 	public static String YEAR = "2009";
 
 	public static String getLicense() {
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 		sb.append(" Copyright (c) " + YEAR + ", " + OWNER + "");
 		sb.append(" All rights reserved.");
 		sb.append("");
@@ -68,13 +68,14 @@ public class JavaAPIPrologCodeWriter extends PrologCodeWriter {
 
 	}
 
-	private String floriProlog;
+	private final String floriProlog;
 
 	
-  public Writer openSource(JPackage pkg, String fileName) throws IOException {
-    Writer w = super.openSource(pkg,fileName);
+  @Override
+  public Writer openSource(final JPackage pkg, final String fileName) throws IOException {
+    final Writer w = super.openSource(pkg,fileName);
     
-    PrintWriter out = new PrintWriter(w);
+    final PrintWriter out = new PrintWriter(w);
     
     // write prolog if this is a java source file
     if( floriProlog != null ) {
@@ -94,7 +95,7 @@ public class JavaAPIPrologCodeWriter extends PrologCodeWriter {
     return w;
 }
 	
-	public JavaAPIPrologCodeWriter(CodeWriter core) {
+	public JavaAPIPrologCodeWriter(final CodeWriter core) {
 		super(core, getLicense());
 		floriProlog = getLicense();
 		LOG.info("JavaAPIPrologCodeWriter " + floriProlog);

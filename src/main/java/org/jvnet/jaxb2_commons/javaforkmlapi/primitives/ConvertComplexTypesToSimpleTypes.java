@@ -25,11 +25,11 @@ import com.sun.tools.xjc.outline.Outline;
 public class ConvertComplexTypesToSimpleTypes extends Command {
 	private static final Logger LOG = Logger.getLogger(ConvertComplexTypesToSimpleTypes.class.getName());
 
-	private JCodeModel cm;
+	private final JCodeModel cm;
 
 	private int replacedTypes;
 
-	public ConvertComplexTypesToSimpleTypes(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public ConvertComplexTypesToSimpleTypes(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 
 		cm = outline.getCodeModel();
@@ -52,7 +52,7 @@ public class ConvertComplexTypesToSimpleTypes extends Command {
 		if (implClass.fields().isEmpty()) {
 			return;
 		}
-		JType stringClass = cm._ref(String.class);
+		final JType stringClass = cm._ref(String.class);
 		replacedTypes = 0;
 		replaceComplexTypes(implClass, "java.lang.Double", cm.DOUBLE);
 		replaceComplexTypes(implClass, "double", cm.DOUBLE);
@@ -67,7 +67,7 @@ public class ConvertComplexTypesToSimpleTypes extends Command {
 		LOG.info(implClass.name() + " types replaced: " + replacedTypes);
 	}
 
-	private void replaceComplexTypes(JDefinedClass implClass, String lookForType, JType replaceWithThisType) {
+	private void replaceComplexTypes(final JDefinedClass implClass, final String lookForType, final JType replaceWithThisType) {
 
 		for (final JFieldVar jFieldVar : implClass.fields().values()) {
 			if (jFieldVar.type().fullName().equals(lookForType)) {
@@ -96,7 +96,7 @@ public class ConvertComplexTypesToSimpleTypes extends Command {
 				replacedTypes++;
 			}
 
-			for (JVar jParams : jFieldVar.listParams()) {
+			for (final JVar jParams : jFieldVar.listParams()) {
 				if (jParams.type().fullName().equals(lookForType)) {
 					jParams.type(replaceWithThisType);
 					// LOG.info("JMethod Param:    " + jParams.name());

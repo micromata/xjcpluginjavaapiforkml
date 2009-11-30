@@ -32,7 +32,7 @@ public class Candidate {
 
 	protected JFieldVar field;
 
-	public Candidate(CClassInfo classInfo) {
+	public Candidate(final CClassInfo classInfo) {
 		this.classInfo = classInfo;
 		this.propertyInfo = classInfo.getProperties().get(0);
 		this.propertyTypeInfo = propertyInfo.ref().iterator().next();

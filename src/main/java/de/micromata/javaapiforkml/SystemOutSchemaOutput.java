@@ -13,9 +13,9 @@ public class SystemOutSchemaOutput extends SchemaOutputResolver
   private StreamResult res;
 
   @Override
-  public Result createOutput(String namespaceUri, String suggestedFilename) throws IOException
+  public Result createOutput(final String namespaceUri, final String suggestedFilename) throws IOException
   {
-    StringWriter out = new StringWriter();
+    final StringWriter out = new StringWriter();
     this.res = new StreamResult(out);
     this.res.setSystemId(suggestedFilename);
     return this.res;
@@ -27,9 +27,9 @@ public class SystemOutSchemaOutput extends SchemaOutputResolver
     return this.res.getWriter().toString();
   }
 
-  public void saveToFile(String filename) throws IOException
+  public void saveToFile(final String filename) throws IOException
   {
-    FileOutputStream sysfile = new FileOutputStream("" + filename);
+    final FileOutputStream sysfile = new FileOutputStream("" + filename);
     sysfile.write(this.res.getWriter().toString().getBytes());
   }
 }

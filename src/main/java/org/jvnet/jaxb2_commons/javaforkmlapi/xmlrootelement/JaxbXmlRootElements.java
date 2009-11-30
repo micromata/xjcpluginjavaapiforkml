@@ -17,11 +17,11 @@ public class JaxbXmlRootElements {
 		this.elements = new ArrayList<JaxbXmlRootElement>();
 	}
 
-	public JaxbXmlRootElements(ArrayList<JaxbXmlRootElement> javadocElements) {
+	public JaxbXmlRootElements(final ArrayList<JaxbXmlRootElement> javadocElements) {
 		this.elements = javadocElements;
 	}
 
-	public void setElements(ArrayList<JaxbXmlRootElement> element) {
+	public void setElements(final ArrayList<JaxbXmlRootElement> element) {
 		this.elements = element;
 	}
 

@@ -41,7 +41,7 @@ import com.sun.tools.xjc.outline.Outline;
 public class BuilderPattern extends Command {
 	private static final Logger LOG = Logger.getLogger(BuilderPattern.class.getName());
 
-	public BuilderPattern(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public BuilderPattern(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 	}
 
@@ -49,9 +49,9 @@ public class BuilderPattern extends Command {
 	public void execute() {
 		LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " appply Builder pattern for classes with required fields");
 		for (final ClassOutline classOutline : outline.getClasses()) {
-			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
+			final ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 
-			Collection<JFieldVar> requiredConstructorFields = Util.getConstructorRequiredFields(cc);
+			final Collection<JFieldVar> requiredConstructorFields = Util.getConstructorRequiredFields(cc);
 			if (requiredConstructorFields.size() > 0) {
 				createArgConstructor(cc, requiredConstructorFields);
 			}
@@ -59,7 +59,7 @@ public class BuilderPattern extends Command {
 		}
 	}
 	
-	private void createNoArgConstructor(final ClassOutline classOutline, int mods) {
+	private void createNoArgConstructor(final ClassOutline classOutline, final int mods) {
 		// Create the default, no-arg constructor
 		final JMethod defaultConstructor = classOutline.implClass.constructor(mods);
 		if (mods == JMod.PRIVATE) {
@@ -70,26 +70,25 @@ public class BuilderPattern extends Command {
 		defaultConstructor.body().invoke("super");
 	}
 
-	private void createArgConstructor(ClassOutlineImpl cc, Collection<JFieldVar> required) {
-		StringBuffer debugOut = new StringBuffer();
+	private void createArgConstructor(final ClassOutlineImpl cc, final Collection<JFieldVar> required) {
+		final StringBuffer debugOut = new StringBuffer();
 		
 		JDefinedClass nestedBuilderClass ;
 		try {
 	     nestedBuilderClass = cc.implClass._class(JMod.PUBLIC | JMod.STATIC, "Builder");
   
-		Map<String, FieldOutline> fieldOutlineasMap = Util.getRequiredFieldsAsMap(cc);
+		final Map<String, FieldOutline> fieldOutlineasMap = Util.getRequiredFieldsAsMap(cc);
 
 		final JMethod defaultConstructor = nestedBuilderClass.constructor(JMod.PUBLIC);
 		defaultConstructor.javadoc().add("Value constructor with only mandatory fields");
 		defaultConstructor.body().invoke("super");
 
-		for (JFieldVar field : required) {
+		for (final JFieldVar field : required) {
 //			FieldOutline fo = fieldOutlineasMap.get(field.name());
 //			if (fo == null) {
 //				continue;
 //			}
 //			if (fo.getPropertyInfo().isCollection()) {
-//				System.out.println("!!!!! " + cc.implClass.name() + " is collection " + field.name() );
 //				continue;
 //			}
 			
@@ -99,7 +98,7 @@ public class BuilderPattern extends Command {
 		}
 		
 		debugOut.append("c> " + cc.implRef.name() + " :: public " + cc.target.shortName + "(");
-		for (JFieldVar field : required) {
+		for (final JFieldVar field : required) {
 			debugOut.append(field.type().name() + ", ");
 		}
 		if (required.size() > 0) {
@@ -108,7 +107,7 @@ public class BuilderPattern extends Command {
 		debugOut.append(")");
 
 		LOG.info(debugOut.toString());
-	  } catch (JClassAlreadyExistsException e) {
+	  } catch (final JClassAlreadyExistsException e) {
 	    // TODO Auto-generated catch block
 	   LOG.info("Exception encountered " + e);
     }

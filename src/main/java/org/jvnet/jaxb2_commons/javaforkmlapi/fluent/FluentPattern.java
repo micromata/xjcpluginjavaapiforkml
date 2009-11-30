@@ -18,7 +18,6 @@ package org.jvnet.jaxb2_commons.javaforkmlapi.fluent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -26,11 +25,11 @@ import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.Util;
 import org.jvnet.jaxb2_commons.javaforkmlapi.XJCJavaForKmlApiPlugin;
 import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
+import org.xml.sax.ErrorHandler;
 
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
-import com.sun.codemodel.JFieldRef;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
@@ -39,7 +38,6 @@ import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
-import com.sun.tools.xjc.generator.bean.field.UntypedListField;
 import com.sun.tools.xjc.model.CClassInfo;
 import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.Aspect;
@@ -48,26 +46,24 @@ import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 import com.sun.tools.xjc.reader.TypeUtil;
 
-import org.xml.sax.ErrorHandler;
-
 public class FluentPattern extends Command {
 	private static final Logger LOG = Logger.getLogger(FluentPattern.class.getName());
 
-	private JCodeModel codeModel;
+	private final JCodeModel codeModel;
 
-	private HashMap<String, ClassOutlineImpl> classList;
+	private final HashMap<String, ClassOutlineImpl> classList;
 
-	private HashMap<String, ArrayList<CClassInfo>> subclasses;
+	private final HashMap<String, ArrayList<CClassInfo>> subclasses;
 
 	private JDefinedClass annotateObvicious = null;
 
 	private JDefinedClass classCoordinates = null;
 
-	private JDefinedClass classIcon;
+	private final JDefinedClass classIcon;
 
-	private JDefinedClass classLink;
+	private final JDefinedClass classLink;
 
-	public FluentPattern(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public FluentPattern(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 		annotateObvicious = pool.getClassObviousAnnotation();
 
@@ -87,12 +83,12 @@ public class FluentPattern extends Command {
 	public void execute() {
 		LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " generate Fluent API");
 		for (final ClassOutline classOutline : outline.getClasses()) {
-			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
+			final ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 			final JDefinedClass implClass = classOutline.implClass;
 
-			for (FieldOutline fieldOutline : classOutline.getDeclaredFields()) {
+			for (final FieldOutline fieldOutline : classOutline.getDeclaredFields()) {
 				JType type = TypeUtil.getCommonBaseType(codeModel, Util.listPossibleTypes(cc, fieldOutline.getPropertyInfo()));
-				if (((type.name().equals("BasicLink") || (type.name().equals("Link")) && Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)).equals("Icon")))) {
+				if (((type.name().equals("BasicLink") || ((type.name().equals("Link")) && Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)).equals("Icon"))))) {
 					/*
 					 * special case for Icon. IconStyle uses protected BasicLink icon.
 					 *  subclasses.get(currentFieldName) will return, that 
@@ -109,7 +105,7 @@ public class FluentPattern extends Command {
 					
 				}
 				
-				String currentFieldName = Util.eliminateTypeSuffix(type.name());
+				final String currentFieldName = Util.eliminateTypeSuffix(type.name());
 			// if (fieldOutline.getPropertyInfo().getName(false).equals("coordinates")) {
 				// LOG.info("+1 "+ cc.implRef.name() + " " + currentFieldName + " " + fieldOutline.getPropertyInfo().getName(false));
 				// }
@@ -128,24 +124,17 @@ public class FluentPattern extends Command {
 					continue;
 				}
 
-				ArrayList<CClassInfo> subclasseslist = subclasses.get(currentFieldName);
+				final ArrayList<CClassInfo> subclasseslist = subclasses.get(currentFieldName);
 				// LOG.info("+  " + currentFieldName + " " + fieldOutline.getPropertyInfo().getName(false));
 				
-//				if (cc.implClass.name().equals("Overlay")) {
-//				System.out.println("<<>><<>><<>>fn "+ cc.implClass.fullName());
-//				System.out.println("<<>><<>><<>>nn "+ type.name());
-//				System.out.println("<<>><<>><<>>fn "+ type.unboxify().fullName());
-//				System.out.println("<<>><<>><<>>nn "+ type.unboxify().name());
-//				System.out.println("<<>><<>><<>>nn "+ fieldOutline.getPropertyInfo().getName(false));
-//				}
 				
 //				if (type.unboxify().name().equals("Link") && fieldOutline.getPropertyInfo().getName(false).equals("icon")) {
 //					type = classIcon.unboxify();
 //				}
 //				if (subclasseslist.size() > 0 && !(type.name().equals("Icon") || type.name().equals("Link") || currentFieldName.equals("Icon") || currentFieldName.equals("Link"))) {
 				if (subclasseslist.size() > 0) { // && !(type.name().equals("Icon") || type.name().equals("Link") || currentFieldName.equals("Icon") || currentFieldName.equals("Link"))) {
-					for (CClassInfo cClassInfo : subclasseslist) {
-//						System.out.println("1<<>><<>><<>>fn 1:"+ cc.implClass.name() + " 2:" + cClassInfo.toType(outline, Aspect.EXPOSED).name() + " 3:" + cClassInfo.shortName + " 4:"+type.name() );
+					for (final CClassInfo cClassInfo : subclasseslist) {
+//						LOG.info("1<<>><<>><<>>fn 1:"+ cc.implClass.name() + " 2:" + cClassInfo.toType(outline, Aspect.EXPOSED).name() + " 3:" + cClassInfo.shortName + " 4:"+type.name() );
 						generateCreateAndSetOrAddMethod(outline, cc, implClass, fieldOutline, cClassInfo.toType(outline, Aspect.EXPOSED),
 						    cClassInfo.shortName);
 					}
@@ -153,7 +142,7 @@ public class FluentPattern extends Command {
 				}
 
 				// use variable-name everywhere instead of variable-type-name (because of Vec2-name conflict)
-//				System.out.println("2<<>><<>><<>>fn 1:"+ cc.implClass.name() + " 2:" + type.name() + " 3:" + Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)) + " 4:"+type.name());
+//				LOG.info("2<<>><<>><<>>fn 1:"+ cc.implClass.name() + " 2:" + type.name() + " 3:" + Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)) + " 4:"+type.name());
 				generateCreateAndSetOrAddMethod(outline, cc, implClass, fieldOutline, type, Util.upperFirst(fieldOutline.getPropertyInfo().getName(false)));
 				
 			}
@@ -170,7 +159,7 @@ public class FluentPattern extends Command {
 	 * 
 	 * <pre> void setField(T field) { this.field = field; } </pre>
 	 */
-	private void generateSetCollection(final ClassOutlineImpl cc, final JFieldVar field, boolean override) {
+	private void generateSetCollection(final ClassOutlineImpl cc, final JFieldVar field, final boolean override) {
 		// creates the setter
 		final JMethod generateSet = cc.implClass.method(JMod.PUBLIC, cc.implClass.owner().VOID, "set" + Util.upperFirst(field.name()));
 		final JVar value = generateSet.param(JMod.FINAL, field.type(), field.name());
@@ -212,14 +201,14 @@ public class FluentPattern extends Command {
 	 * </pre>
 	 * @param type2
 	 */
-	private void generateAddToCollection(final ClassOutlineImpl cc, final JFieldVar field, boolean override) {
-		CPropertyInfo propertyInfo = Util.searchPropertyInfo(cc, field.name());
+	private void generateAddToCollection(final ClassOutlineImpl cc, final JFieldVar field, final boolean override) {
+		final CPropertyInfo propertyInfo = Util.searchPropertyInfo(cc, field.name());
 		if (propertyInfo == null) {
 			return;
 		}
 
 		if (field.name().equals("coordinates") && !override) {
-			System.out.println("its a coordinate");
+			LOG.info("its a coordinate");
 			coordinateAddtoCase(cc, field, propertyInfo);
 			return;
 		}
@@ -227,17 +216,17 @@ public class FluentPattern extends Command {
 		commonAddtoCase(cc, field, override, propertyInfo);
 	}
 
-	private void coordinateAddtoCase(ClassOutlineImpl cc, JFieldVar field, CPropertyInfo propertyInfo) {
+	private void coordinateAddtoCase(final ClassOutlineImpl cc, final JFieldVar field, final CPropertyInfo propertyInfo) {
 
-		Collection<JFieldVar> coordinateCreateMethods = new ArrayList<JFieldVar>();
-		JFieldVar longitude = classCoordinates.fields().get("longitude");
-		JFieldVar latitude = classCoordinates.fields().get("latitude");
+		final Collection<JFieldVar> coordinateCreateMethods = new ArrayList<JFieldVar>();
+		final JFieldVar longitude = classCoordinates.fields().get("longitude");
+		final JFieldVar latitude = classCoordinates.fields().get("latitude");
 
 		coordinateCreateMethods.add(longitude);
 		coordinateCreateMethods.add(latitude);
 		createArgFactoryMethod(cc, coordinateCreateMethods);
 
-		JFieldVar altitude = classCoordinates.fields().get("altitude");
+		final JFieldVar altitude = classCoordinates.fields().get("altitude");
 		coordinateCreateMethods.add(altitude);
 		createArgFactoryMethod(cc, coordinateCreateMethods);
 
@@ -246,7 +235,7 @@ public class FluentPattern extends Command {
 		// create public Point addToCoordinates(final String coordinates) {...}
 		final JMethod generateAdd = cc.implClass.method(JMod.PUBLIC, cc.implClass, "addToCoordinates");
 		generateAdd.javadoc().append("add a value to the coordinates property collection");
-		JInvocation returntype = JExpr._new(classCoordinates);
+		final JInvocation returntype = JExpr._new(classCoordinates);
 		final JVar arg = generateAdd.param(JMod.FINAL, String.class, field.name());
 		generateAdd.javadoc().addParam(arg).append("required parameter");
 		returntype.arg(arg);
@@ -257,11 +246,11 @@ public class FluentPattern extends Command {
 
 	}
 
-	private void createArgFactoryMethod(ClassOutlineImpl cc, Collection<JFieldVar> coordinateCreateMethods) {
+	private void createArgFactoryMethod(final ClassOutlineImpl cc, final Collection<JFieldVar> coordinateCreateMethods) {
 		final JMethod generateAdd = cc.implClass.method(JMod.PUBLIC, cc.implClass, "addToCoordinates");
 		generateAdd.javadoc().append("add a value to the coordinates property collection");
-		JInvocation returntype = JExpr._new(classCoordinates);
-		for (JFieldVar field : coordinateCreateMethods) {
+		final JInvocation returntype = JExpr._new(classCoordinates);
+		for (final JFieldVar field : coordinateCreateMethods) {
 
 			final JVar arg = generateAdd.param(JMod.FINAL, field.type(), field.name());
 			generateAdd.javadoc().addParam(arg).append("required parameter");
@@ -274,7 +263,7 @@ public class FluentPattern extends Command {
 
 	}
 
-	private void commonAddtoCase(final ClassOutlineImpl cc, final JFieldVar field, boolean override, CPropertyInfo propertyInfo) {
+	private void commonAddtoCase(final ClassOutlineImpl cc, final JFieldVar field, final boolean override, final CPropertyInfo propertyInfo) {
 		// find the common type
 		final JType type = TypeUtil.getCommonBaseType(codeModel, Util.listPossibleTypes(cc, propertyInfo));
 
@@ -315,27 +304,27 @@ public class FluentPattern extends Command {
 	 * 
 	 * <pre> void setField(T field) { this.field = field; } </pre>
 	 */
-	private void generateSetAndAddToCollection(ClassOutlineImpl cc) {
-		Collection<JFieldVar> optionalFluentFields = Util.getAllFieldsFields(cc, true);
+	private void generateSetAndAddToCollection(final ClassOutlineImpl cc) {
+		final Collection<JFieldVar> optionalFluentFields = Util.getAllFieldsFields(cc, true);
 
 		if (optionalFluentFields.size() == 0) {
 			return;
 		}
 
 		// LOG.info(cc.implRef.name() + " contains fields: " + optionalFluentFields.size());
-		for (JFieldVar field : optionalFluentFields) {
+		for (final JFieldVar field : optionalFluentFields) {
 			generateSetCollection(cc, field, false);
 			generateAddToCollection(cc, field, false);
 		}
 
 		// check for methods in superclass
-		Collection<JFieldVar> superclassFields = Util.getSuperclassAllFields(cc, true);
+		final Collection<JFieldVar> superclassFields = Util.getSuperclassAllFields(cc, true);
 		if (superclassFields.size() == 0) {
 			return;
 		}
 
 		// LOG.info(cc.implRef.name() + " contains super fields: " + superclassFields.size());
-		for (JFieldVar field : superclassFields) {
+		for (final JFieldVar field : superclassFields) {
 			generateSetCollection(cc, field, true);
 			generateAddToCollection(cc, field, true);
 		}
@@ -346,10 +335,10 @@ public class FluentPattern extends Command {
 	 * 
 	 * <pre> void setField(T field) { this.field = field; } </pre>
 	 */
-	private void generateWith(final ClassOutlineImpl cc, final JFieldVar field, boolean override) {
+	private void generateWith(final ClassOutlineImpl cc, final JFieldVar field, final boolean override) {
 		// creates the setter
 		final JMethod generateWith = cc.implClass.method(JMod.PUBLIC, cc.implClass, "with" + Util.upperFirst(field.name()));
-		final JVar value = generateWith.param(JMod.FINAL, field.type(), field.name());
+		final JVar value = generateWith.param(JMod.FINAL, Util.removeJAXBElement(cm, field.type()), field.name());
 		// set the assignment to the body: this.value = value;
 		if (override) {
 			if (annotateObvicious != null) {
@@ -373,37 +362,37 @@ public class FluentPattern extends Command {
 	}
 
 	private void generateWithMethods(final ClassOutlineImpl cc) {
-		Collection<JFieldVar> optionalFluentFields = Util.getFields(cc, false, false);
+		final Collection<JFieldVar> optionalFluentFields = Util.getFields(cc, false, false);
 		if (optionalFluentFields.size() == 0) {
 			return;
 		}
 
 		// LOG.info(cc.implRef.name() + " contains fields: " + optionalFluentFields.size());
-		for (JFieldVar field : optionalFluentFields) {
+		for (final JFieldVar field : optionalFluentFields) {
 			generateWith(cc, field, false);
 		}
 
 		// check for methods in superclass
-		Collection<JFieldVar> superclassFields = Util.getSuperclassFields(cc, false, false);
+		final Collection<JFieldVar> superclassFields = Util.getSuperclassFields(cm, cc, false, false);
 		if (superclassFields.size() == 0) {
 			return;
 		}
 
 		// LOG.info(cc.implRef.name() + " contains super fields: " + superclassFields.size());
-		for (JFieldVar field : superclassFields) {
+		for (final JFieldVar field : superclassFields) {
 			generateWith(cc, field, true);
 		}
 	}
 
-	private void generateCreateAndSetOrAddMethod(Outline outline, ClassOutlineImpl cc, final JDefinedClass implClass,
-	    FieldOutline fieldOutline, JType cClassInfo, String shortName) {
+	private void generateCreateAndSetOrAddMethod(final Outline outline, final ClassOutlineImpl cc, final JDefinedClass implClass,
+	    final FieldOutline fieldOutline, final JType cClassInfo, final String shortName) {
 
-		StringBuffer debugOut = new StringBuffer();
+		final StringBuffer debugOut = new StringBuffer();
 
-		String localName = "newValue";
+		final String localName = "newValue";
 		final CPropertyInfo property = fieldOutline.getPropertyInfo();
-		StringBuffer methodName = new StringBuffer();
-		ArrayList<String> javadoc = new ArrayList<String>();
+		final StringBuffer methodName = new StringBuffer();
+		final ArrayList<String> javadoc = new ArrayList<String>();
 		methodName.append("createAnd");
 
 		JInvocation methodInvoke = null;
@@ -431,21 +420,21 @@ public class FluentPattern extends Command {
 		}
 
 		// cClassInfo
-		ClassOutlineImpl asClass = classList.get(cClassInfo.fullName());
+		final ClassOutlineImpl asClass = classList.get(cClassInfo.fullName());
 
-		Collection<JFieldVar> relevantFields = Util.getConstructorRequiredFields(asClass);
+		final Collection<JFieldVar> relevantFields = Util.getConstructorRequiredFields(asClass);
 
-		Map<String, FieldOutline> fieldOutlineasMap = Util.getRequiredFieldsAsMap(cc);
+		final Map<String, FieldOutline> fieldOutlineasMap = Util.getRequiredFieldsAsMap(cc);
 
-		JMethod m = implClass.method(JMod.PUBLIC, cClassInfo, methodName.toString() + shortName);
-		JInvocation args = JExpr._new(cClassInfo);
-		for (JFieldVar field : relevantFields) {
+		final JMethod m = implClass.method(JMod.PUBLIC, cClassInfo, methodName.toString() + shortName);
+		final JInvocation args = JExpr._new(cClassInfo);
+		for (final JFieldVar field : relevantFields) {
 			// FieldOutline fo = fieldOutlineasMap.get(field.name());
 			// if (fo == null) {
 			// continue;
 			// }
 			// if (fo.getPropertyInfo().isCollection()) {
-			// System.out.println("!!!!! " + cc.implClass.name() + " is collection " + methodName );
+			// LOG.info("!!!!! " + cc.implClass.name() + " is collection " + methodName );
 			// continue;
 			// }
 			final JVar arg = m.param(JMod.FINAL, field.type(), field.name());
@@ -464,7 +453,7 @@ public class FluentPattern extends Command {
 		m.javadoc().append(javadoc);
 		debugOut.append("m> " + cc.implRef.name() + " :: public " + cClassInfo.name() + " " + methodName.toString() + shortName + "(");
 
-		for (JFieldVar field : relevantFields) {
+		for (final JFieldVar field : relevantFields) {
 			debugOut.append(field.type().name() + ", ");
 		}
 		if (relevantFields.size() > 0) {

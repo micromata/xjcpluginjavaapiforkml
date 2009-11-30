@@ -15,8 +15,6 @@
 // ///////////////////////////////////////////////////////////////////////////
 package org.jvnet.jaxb2_commons.javaforkmlapi.missingicon;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jvnet.jaxb2_commons.javaforkmlapi.ClazzPool;
 import org.jvnet.jaxb2_commons.javaforkmlapi.XJCJavaForKmlApiPlugin;
@@ -24,17 +22,13 @@ import org.jvnet.jaxb2_commons.javaforkmlapi.command.Command;
 import org.xml.sax.ErrorHandler;
 
 import com.sun.codemodel.JDefinedClass;
-import com.sun.codemodel.JExpression;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
-import com.sun.tools.xjc.generator.bean.field.SingleField;
-import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.outline.ClassOutline;
-import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
 
 public class CreateIconClass extends Command {
@@ -47,7 +41,7 @@ public class CreateIconClass extends Command {
 	 * 
 	 * @param classFactory
 	 */
-	public CreateIconClass(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public CreateIconClass(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 	}
 
@@ -55,7 +49,7 @@ public class CreateIconClass extends Command {
 	public void execute() {
 		JDefinedClass elementType = null;
 		for (final ClassOutline classOutline : outline.getClasses()) {
-			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
+			final ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 			if (cc.implRef.name().equals("Icon") && cc.implClass._extends().name().equals("BasicLink")) {
 				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " link class found.");
 				elementType = cc.implClass;
@@ -77,7 +71,7 @@ public class CreateIconClass extends Command {
 					jmethod.type(elementType);
 				}
 
-				for (JVar jParams : jmethod.listParams()) {
+				for (final JVar jParams : jmethod.listParams()) {
 					if (jmethod.name().endsWith("Icon") && shouldItBeAnIcon(jParams.type())) {
 						jParams.type(elementType);
 					}

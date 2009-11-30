@@ -1,6 +1,7 @@
 package org.jvnet.jaxb2_commons.javaforkmlapi.coordinate;
 
 import java.util.ArrayList;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -27,12 +28,12 @@ import com.sun.tools.xjc.outline.Outline;
 public class CreateCreateAndAddMethodsForCoordinates extends Command {
 	private static final Logger LOG = Logger.getLogger(CreateCreateAndAddMethodsForCoordinates.class.getName());
 
-	private JCodeModel codeModel;
+	private final JCodeModel codeModel;
 
-	private JDefinedClass annotateCoordinates;
+	private final JDefinedClass annotateCoordinates;
 
 
-	public CreateCreateAndAddMethodsForCoordinates(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public CreateCreateAndAddMethodsForCoordinates(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 		codeModel = outline.getCodeModel();
 		annotateCoordinates = pool.getClassCoordinate();
@@ -41,7 +42,7 @@ public class CreateCreateAndAddMethodsForCoordinates extends Command {
 	@Override
 	public void execute() {
 		for (final ClassOutline classOutline : outline.getClasses()) {
-			ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
+			final ClassOutlineImpl cc = (ClassOutlineImpl) classOutline;
 			generateGetClassMethod(cc);
 
 			for (final JFieldVar jFieldVar : cc.implClass.fields().values()) {
@@ -58,9 +59,9 @@ public class CreateCreateAndAddMethodsForCoordinates extends Command {
 	@SuppressWarnings("unchecked")
 	protected Class collectionClass = java.util.ArrayList.class;
 
-	private void generateCreateAndSetCoordinatesMethod(Outline outline, ClassOutlineImpl cc, final JDefinedClass implClass, JFieldVar fieldVar) {
+	private void generateCreateAndSetCoordinatesMethod(final Outline outline, final ClassOutlineImpl cc, final JDefinedClass implClass, final JFieldVar fieldVar) {
 
-		StringBuffer debugOut = new StringBuffer();
+		final StringBuffer debugOut = new StringBuffer();
 
 		JClass jaxbElementClass = null;
 		if (annotateCoordinates != null) {
@@ -69,10 +70,10 @@ public class CreateCreateAndAddMethodsForCoordinates extends Command {
 			jaxbElementClass = codeModel.ref(ArrayList.class).narrow(annotateCoordinates);
 		}
 		// cClassInfo
-		String createAndSetCoordinatesName = "createAndSetCoordinates";
-		JMethod m = implClass.method(JMod.PUBLIC, fieldVar.type(), createAndSetCoordinatesName);
-		JVar newValue = m.body().decl(fieldVar.type(), "newValue", JExpr._new(jaxbElementClass));
-		JInvocation methodInvoke = JExpr._this().invoke("set" + Util.upperFirst(fieldVar.name())).arg(newValue);
+		final String createAndSetCoordinatesName = "createAndSetCoordinates";
+		final JMethod m = implClass.method(JMod.PUBLIC, fieldVar.type(), createAndSetCoordinatesName);
+		final JVar newValue = m.body().decl(fieldVar.type(), "newValue", JExpr._new(jaxbElementClass));
+		final JInvocation methodInvoke = JExpr._this().invoke("set" + Util.upperFirst(fieldVar.name())).arg(newValue);
 		m.body().add(methodInvoke);
 		m.body()._return(newValue);
 
@@ -80,7 +81,7 @@ public class CreateCreateAndAddMethodsForCoordinates extends Command {
 		m.javadoc().append(fieldVar.type());
 		m.javadoc().append("and set it to this." + fieldVar.name() + ".\n");
 
-		ArrayList<String> javadoc = new ArrayList<String>();
+		final ArrayList<String> javadoc = new ArrayList<String>();
 		javadoc.add("\n");
 		javadoc.add("This method is a short version for:\n");
 		javadoc.add("<pre>\n");
@@ -95,7 +96,7 @@ public class CreateCreateAndAddMethodsForCoordinates extends Command {
 		LOG.info(debugOut.toString());
 	}
 
-	private void generateGetClassMethod(ClassOutlineImpl cc) {
+	private void generateGetClassMethod(final ClassOutlineImpl cc) {
 		if (cc.target.isAbstract()) {
 			return;
 		}

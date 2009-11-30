@@ -19,7 +19,6 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
-import com.sun.codemodel.JOp;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
@@ -44,15 +43,15 @@ public class CreateCoordinateClass extends Command {
 
 	private JFieldVar altitude;
 
-	private JType stringClass;
+	private final JType stringClass;
 
-	private JType illegalArgumentExceptionClass;
+	private final JType illegalArgumentExceptionClass;
 
-	private JType doubleClass;
+	private final JType doubleClass;
 
-	private JType stringBufferClass;
+	private final JType stringBufferClass;
 
-	private JType stringBuilderClass;
+	private final JType stringBuilderClass;
 
 	/*
 	 * A single tuple consisting of floating point values for longitude, latitude, and altitude (in that order). Longitude and latitude values
@@ -70,7 +69,7 @@ public class CreateCoordinateClass extends Command {
 	 * 
 	 * @param classFactory
 	 */
-	public CreateCoordinateClass(Outline outline, Options opts, ErrorHandler errorHandler, ClazzPool pool) {
+	public CreateCoordinateClass(final Outline outline, final Options opts, final ErrorHandler errorHandler, final ClazzPool pool) {
 		super(outline, opts, errorHandler, pool);
 		cm = outline.getCodeModel();
 
@@ -86,11 +85,11 @@ public class CreateCoordinateClass extends Command {
 
 	}
 
-	private void createCoordinateClass(Outline outline) {
+	private void createCoordinateClass(final Outline outline) {
 		// JPackage kmlpackage = Util.getKmlClassPackage(outline);
 		// CodeModelClassFactory classFactory = outline.getClassFactory();
 		// coordinateClass = classFactory.createClass(kmlpackage, JMod.PUBLIC, "Coordinate", null, ClassType.CLASS);
-		JDefinedClass coordinateClass = pool.getClassCoordinate();
+		final JDefinedClass coordinateClass = pool.getClassCoordinate();
 
 		longitude = coordinateClass.fields().get("longitude");
 		latitude = coordinateClass.fields().get("latitude");
@@ -125,7 +124,7 @@ public class CreateCoordinateClass extends Command {
 		//			String[] coords = coordinates.replaceAll(",[ ]+?", ",").trim().split(",");
 		//			to:
 		//			String[] coords = coordinates.replaceAll(",\\s+", ",").trim().split(",");
-		JVar varCoords = stringArgConstructor.body().decl(stringClass.array(), "coords",
+		final JVar varCoords = stringArgConstructor.body().decl(stringClass.array(), "coords",
 		    stringConstructorArg.invoke("replaceAll").arg(",\\s+").arg(",").invoke("trim").invoke("split").arg(","));
 		// CODE: if ((coords < 1) && (coords > 3)) {throw IllegalArgumentException}
 		stringArgConstructor.body()._if(
@@ -140,9 +139,9 @@ public class CreateCoordinateClass extends Command {
 		    JExpr.refthis(altitude.name()), JExpr.ref("Double").invoke("parseDouble").arg(JExpr.direct("coords[2]")));
 
 		// toString
-		JMethod toString = coordinateClass.method(JMod.PUBLIC, stringClass, "toString");
+		final JMethod toString = coordinateClass.method(JMod.PUBLIC, stringClass, "toString");
 		toString.annotate(Override.class);
-		JVar sbVar = toString.body().decl(stringBuilderClass, "sb", JExpr._new(stringBuilderClass));
+		final JVar sbVar = toString.body().decl(stringBuilderClass, "sb", JExpr._new(stringBuilderClass));
 		toString.body().add(sbVar.invoke("append").arg(longitude));
 		toString.body().add(sbVar.invoke("append").arg(","));
 		toString.body().add(sbVar.invoke("append").arg(latitude));
@@ -160,35 +159,35 @@ public class CreateCoordinateClass extends Command {
 	
 
 
-	private void createCoordinateClassConverter(Outline outline) {
+	private void createCoordinateClassConverter(final Outline outline) {
 		// JPackage kmlpackage = Util.getKmlClassPackage(outline);
 		// CodeModelClassFactory classFactory = outline.getClassFactory();
 		// coordinateClassConverter = classFactory.createClass(kmlpackage, JMod.PUBLIC | JMod.FINAL, "CoordinatesConverter", null,
 		// ClassType.CLASS);
-		JDefinedClass coordinateClassConverter = pool.getClassCoordinateConverter();
-		JDefinedClass coordinateClass = pool.getClassCoordinate();
+		final JDefinedClass coordinateClassConverter = pool.getClassCoordinateConverter();
+		final JDefinedClass coordinateClass = pool.getClassCoordinate();
 
-		JClass listGenericsCoordinates = outline.getCodeModel().ref(List.class).narrow(coordinateClass);
-		JClass arraylistGenericsCoordinates = outline.getCodeModel().ref(ArrayList.class).narrow(coordinateClass);
-		JClass xmladapter = outline.getCodeModel().ref(XmlAdapter.class).narrow(String.class).narrow(listGenericsCoordinates);
+		final JClass listGenericsCoordinates = outline.getCodeModel().ref(List.class).narrow(coordinateClass);
+		final JClass arraylistGenericsCoordinates = outline.getCodeModel().ref(ArrayList.class).narrow(coordinateClass);
+		final JClass xmladapter = outline.getCodeModel().ref(XmlAdapter.class).narrow(String.class).narrow(listGenericsCoordinates);
 		coordinateClassConverter._extends(xmladapter);
 
 		// final JMethod stringArgConstructor = coordinateClassConverter.constructor(JMod.PRIVATE);
 
 		// toString
-		JMethod marshall = coordinateClassConverter.method(JMod.PUBLIC, String.class, "marshal");
-		JVar stringConstructorArg = marshall.param(JMod.FINAL, listGenericsCoordinates, "dt");
+		final JMethod marshall = coordinateClassConverter.method(JMod.PUBLIC, String.class, "marshal");
+		final JVar stringConstructorArg = marshall.param(JMod.FINAL, listGenericsCoordinates, "dt");
 		marshall._throws(Exception.class);
 		marshall.annotate(Override.class);
-		JVar sbVarMarshall = marshall.body().decl(stringBuilderClass, "sb", JExpr._new(stringBuilderClass));
-		JForEach forMarshall = marshall.body().forEach(coordinateClass, "coord", stringConstructorArg);
+		final JVar sbVarMarshall = marshall.body().decl(stringBuilderClass, "sb", JExpr._new(stringBuilderClass));
+		final JForEach forMarshall = marshall.body().forEach(coordinateClass, "coord", stringConstructorArg);
 		// forMarshall.body().add(sbVarMarshall.invoke("append").arg(forMarshall.var().name() + " + \" \""));
 		forMarshall.body().add(sbVarMarshall.invoke("append").arg(JExpr.direct("coord + \" \"")));
 		marshall.body()._return(sbVarMarshall.invoke("toString").invoke("trim"));
 
 		// toString
-		JMethod unmarshall = coordinateClassConverter.method(JMod.PUBLIC, listGenericsCoordinates, "unmarshal");
-		JVar unmarshallparam = unmarshall.param(JMod.FINAL, String.class, "s");
+		final JMethod unmarshall = coordinateClassConverter.method(JMod.PUBLIC, listGenericsCoordinates, "unmarshal");
+		final JVar unmarshallparam = unmarshall.param(JMod.FINAL, String.class, "s");
 		unmarshall._throws(Exception.class);
 		unmarshall.annotate(Override.class);
 
@@ -197,28 +196,28 @@ public class CreateCoordinateClass extends Command {
 		//			String[] coords = s.replaceAll(",[ ]+?", ",").trim().split(" ");
 		//			to:
 		//			String[] coords = s.replaceAll(",\\s+", ",").trim().split("\\s+");
-		JVar varCoords1 = unmarshall.body().decl(stringClass.array(), "coords",
+		final JVar varCoords1 = unmarshall.body().decl(stringClass.array(), "coords",
 		    unmarshallparam.invoke("replaceAll").arg(",[\\s]+").arg(",").invoke("trim").invoke("split").arg("\\s+"));
 
-		JVar coordinateslist = unmarshall.body().decl(listGenericsCoordinates, "coordinates", JExpr._new(arraylistGenericsCoordinates));
+		final JVar coordinateslist = unmarshall.body().decl(listGenericsCoordinates, "coordinates", JExpr._new(arraylistGenericsCoordinates));
 		unmarshall.body()._if(JExpr.ref(varCoords1.name()).ref("length").lte(JExpr.lit(0)))._then().block()._return(coordinateslist);
 
-		JForEach forUnMarshall = unmarshall.body().forEach(stringClass, "string", varCoords1);
+		final JForEach forUnMarshall = unmarshall.body().forEach(stringClass, "string", varCoords1);
 		forUnMarshall.body().add(coordinateslist.invoke("add").arg(JExpr._new(coordinateClass).arg(forUnMarshall.var())));
 		unmarshall.body()._return(coordinateslist);
 	}
 
-	private void addSimpleSetterAndGetter(final JDefinedClass coordinateClass, JFieldVar arg) {
-		JMethod getMethod = coordinateClass.method(JMod.PUBLIC, cm.DOUBLE, "get" + Util.upperFirst(arg.name()));
+	private void addSimpleSetterAndGetter(final JDefinedClass coordinateClass, final JFieldVar arg) {
+		final JMethod getMethod = coordinateClass.method(JMod.PUBLIC, cm.DOUBLE, "get" + Util.upperFirst(arg.name()));
 		getMethod.body()._return(arg);
 
-		JMethod setMethod = coordinateClass.method(JMod.PUBLIC, coordinateClass, "set" + Util.upperFirst(arg.name()));
+		final JMethod setMethod = coordinateClass.method(JMod.PUBLIC, coordinateClass, "set" + Util.upperFirst(arg.name()));
 		addConstructorParam(setMethod, arg);
 		setMethod.body()._return(JExpr._this());
 
 	}
 
-	private void addConstructorParam(final JMethod constructor, JFieldVar arg) {
+	private void addConstructorParam(final JMethod constructor, final JFieldVar arg) {
 		final JVar constructorArg = constructor.param(JMod.FINAL, cm.DOUBLE, arg.name());
 		constructor.body().assign(JExpr.refthis(arg.name()), constructorArg);
 	}
@@ -242,25 +241,25 @@ public class CreateCoordinateClass extends Command {
 			if (jFieldVar.name().equals("coordinates")) {
 				LOG.info("1+++ " + cc.implRef.name() + " " + jFieldVar.type().name() + " " + jFieldVar.name());
 
-				JDefinedClass candidateClass = cc.implClass;
-				JClass newInterfaceClass = candidateClass.owner().ref(interfaceClass).narrow(pool.getClassCoordinate());
-				JClass newCollectionClass = candidateClass.owner().ref(collectionClass).narrow(pool.getClassCoordinate());
+				final JDefinedClass candidateClass = cc.implClass;
+				final JClass newInterfaceClass = candidateClass.owner().ref(interfaceClass).narrow(pool.getClassCoordinate());
+				final JClass newCollectionClass = candidateClass.owner().ref(collectionClass).narrow(pool.getClassCoordinate());
 
 				jFieldVar.type(newInterfaceClass);
 				// Find original getter and setter methods to remove.
-				ArrayList<JMethod> methodsToRemove = new ArrayList<JMethod>();
-				for (JMethod m : candidateClass.methods()) {
+				final ArrayList<JMethod> methodsToRemove = new ArrayList<JMethod>();
+				for (final JMethod m : candidateClass.methods()) {
 					if (m.name().equals("set" + Util.upperFirst(jFieldVar.name())) || m.name().equals("get" + Util.upperFirst(jFieldVar.name()))) {
 						methodsToRemove.add(m);
 					}
 				}
 				// Remove original getter and setter methods.
-				for (JMethod m : methodsToRemove) {
+				for (final JMethod m : methodsToRemove) {
 					candidateClass.methods().remove(m);
 				}
 				// Add a new getter method returning the (wrapped) field added.
 				// CODE: public I<T> getFieldname() { ... };
-				JMethod method = candidateClass.method(JMod.PUBLIC, newInterfaceClass, "get" + Util.upperFirst(jFieldVar.name()));
+				final JMethod method = candidateClass.method(JMod.PUBLIC, newInterfaceClass, "get" + Util.upperFirst(jFieldVar.name()));
 
 				// CODE: if (fieldName == null) fieldName = new C<T>();
 				method.body()._if(JExpr.ref(jFieldVar.name()).eq(JExpr._null()))._then().assign(JExpr.ref(jFieldVar.name()),
