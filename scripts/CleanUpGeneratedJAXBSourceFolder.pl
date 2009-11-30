@@ -44,26 +44,6 @@ sub removeJAXBElementForOneJavaFile {
 	open( FH, "+< $filehandle" ) or die "Can't open file: $!\n" && return 0;
 	my @currentJavaFile = <FH>;
 
-	# delete all that isn't asked for
-	#if ($filehandle =~ /ScaleDeprecated.java/ ) {
-	#	$removeddeprecatedfiles++;
-	#	unlink($filehandle);
-	#	return 0;
-	#}
-	# delete all that isn't asked for
-	#if ($filehandle =~ /SnippetDeprecated.java/ ) {
-	#	$removeddeprecatedfiles++;
-	#	unlink($filehandle);
-	#	return 0;
-	#}
-
-	# AltitudeModeEnumType1.java
-	#if ($filehandle =~ /AltitudeModeEnumTypeDeprecated.java/ ) {
-	#	$removeddeprecatedfiles++;
-	#	unlink($filehandle);
-	#	return 0;
-	#}
-
 	# hihihi (:
 	if ( $filehandle =~ /ObjectFactory.java/ ) {
 		$removeddeprecatedfiles++;
@@ -124,7 +104,7 @@ sub removeJAXBElementForOneJavaFile {
 			}
 
 			if ( $currentJavaFile[$i] =~ s/(.*?)(\@XmlElementRef\(name = .altitudeModeGroup.*?)(, type = .*?.class[, required = false]*.*?)(\))/$1\@XmlElement(defaultValue = \"clampToGround\")/g ) {
-				$currentJavaFile[ $i + 1 ] = "    protected AltitudeMode altitudeMode = AltitudeMode.CLAMP_TO_GROUND;\n";
+				$currentJavaFile[ $i + 1 ] = "    protected AltitudeMode altitudeMode;\n";
 				$jaxbelementFileCount++;
 			}
 
