@@ -19,7 +19,6 @@ import com.sun.codemodel.JType;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.generator.bean.ClassOutlineImpl;
-import com.sun.tools.xjc.model.CClassInfo;
 import com.sun.tools.xjc.model.CPropertyInfo;
 import com.sun.tools.xjc.model.CTypeInfo;
 import com.sun.tools.xjc.outline.Aspect;
@@ -49,9 +48,6 @@ public class AddProperJavaDocumentationForKML extends Command {
 
 	@Override
 	public void execute() {
-		final HashMap<String, ClassOutlineImpl> classList = Util.getClassList(outline);
-		final HashMap<String, ArrayList<CClassInfo>> subclasses = Util.findSubClasses(outline);
-
 		HashMap<String, JaxbJavaDoc> kmlJavaDocElements = null;
 		kmlJavaDocElements = getObjectsFromXmlWithJaxb(LOADJAVADOCSFROMFILE);
 
