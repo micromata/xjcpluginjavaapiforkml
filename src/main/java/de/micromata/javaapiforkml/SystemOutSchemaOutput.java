@@ -29,7 +29,8 @@ public class SystemOutSchemaOutput extends SchemaOutputResolver
 
   public void saveToFile(final String filename) throws IOException
   {
-    final FileOutputStream sysfile = new FileOutputStream("" + filename);
-    sysfile.write(this.res.getWriter().toString().getBytes());
+    try(final FileOutputStream sysfile = new FileOutputStream(filename);) {
+    		sysfile.write(this.res.getWriter().toString().getBytes());    	
+    }
   }
 }
