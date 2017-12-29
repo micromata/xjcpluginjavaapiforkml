@@ -41,7 +41,8 @@ import com.sun.tools.xjc.outline.Outline;
 import com.sun.xml.xsom.XSSchema;
 
 /**
- * {@link Plugin} that always removes the Type-Suffix (if present) from generated classes.
+ * {@link Plugin} that always removes the Type-Suffix (if present) from
+ * generated classes.
  * 
  * <pre>
  * 
@@ -90,14 +91,14 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 		for (final CClassInfo classInfo : model.beans().values()) {
 			if (classInfo.shortName.equals("Link") && classInfo.getOwnerPackage().name().equals(mainPackage.name())) {
 				classLink = classInfo;
-//				for (iterable_type iterable_element : classLink.getProperties()) {
-//	        
-//        }
+				// for (iterable_type iterable_element : classLink.getProperties()) {
+				//
+				// }
 				Util.logInfo("Found Link class, prepare creation of Icon class");
 				break;
 			}
 		}
-		
+
 		for (final CClassInfo classInfo : model.beans().values()) {
 			if (classInfo.fullName().equals(PACKAGE_GX + ".TourPrimitive") && !classInfo.isAbstract()) {
 				classInfo.setAbstract();
@@ -105,25 +106,26 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 				break;
 			}
 		}
-		
-//		for (final CClassInfo classInfo : model.beans().values()) {
-//			LOG.info("++++++ " + classInfo.fullName());
-//			for (CPropertyInfo p : classInfo.getProperties()) {
-//				String fullName = p.baseType.fullName();
-//				LOG.info("++++++ " + fullName);
-//      }
-//		}
-//		
-//		for (CClassInfo classInfo : model.beans().values()) {
-//			if (classInfo.fullName().equals(PACKAGE_GX + ".Playlist")) {
-//				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " Found Playlist class!");
-//				List<CPropertyInfo> properties = classInfo.getProperties();
-//				for (CPropertyInfo cPropertyInfo : properties) {
-//					LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " > " + cPropertyInfo.kind(). + " " + cPropertyInfo.getName(true));
-//        }
-//				break;
-//			}
-//		}
+
+		// for (final CClassInfo classInfo : model.beans().values()) {
+		// LOG.info("++++++ " + classInfo.fullName());
+		// for (CPropertyInfo p : classInfo.getProperties()) {
+		// String fullName = p.baseType.fullName();
+		// LOG.info("++++++ " + fullName);
+		// }
+		// }
+		//
+		// for (CClassInfo classInfo : model.beans().values()) {
+		// if (classInfo.fullName().equals(PACKAGE_GX + ".Playlist")) {
+		// LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " Found Playlist class!");
+		// List<CPropertyInfo> properties = classInfo.getProperties();
+		// for (CPropertyInfo cPropertyInfo : properties) {
+		// LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " > " + cPropertyInfo.kind(). +
+		// " " + cPropertyInfo.getName(true));
+		// }
+		// break;
+		// }
+		// }
 
 		for (final CEnumLeafInfo classInfo : model.enums().values()) {
 			if (classInfo.fullName().equals(PACKAGE_KML + ".AltitudeMode")) {
@@ -136,8 +138,7 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 				LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " Found AltitudeMode in GX package");
 				continue;
 			}
-			
-			
+
 		}
 		assert mainPackage != null;
 		assert classLink != null;
@@ -150,52 +151,53 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 		LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " -------Icon properties ------------------");
 		final CClassInfoParent cClassInfoParentLink = classLink.parent();
 
-		final CClassInfo iconClass = new CClassInfo(model, cClassInfoParentLink, "Icon", null, new QName("Icon"), null, schema, new CCustomizations());
+		final CClassInfo iconClass = new CClassInfo(model, cClassInfoParentLink, "Icon", null, new QName("Icon"), null,
+				schema, new CCustomizations());
 		iconClass.setBaseClass(classLink.getBaseClass());
 
-		//fill icon class with the properties defined in link class
+		// fill icon class with the properties defined in link class
 		final List<CPropertyInfo> properties = classLink.getProperties();
 		for (final CPropertyInfo c : properties) {
 			iconClass.addProperty(c);
 		}
-		
+
 		final Collection<CEnumConstant> constants = altitudeModeGX.getConstants();
 		for (final CEnumConstant cEnumConstant : constants) {
-			altitudeModeKML.members.add( new CEnumConstant(cEnumConstant.getName(), null, cEnumConstant.getLexicalValue(), null, null, null));
-    }
-		
-		//model.enums().remove(altitudeModeGX.fullName());
-		
-//		altitudeModeKML.javadoc
+			altitudeModeKML.members.add(new CEnumConstant(cEnumConstant.getName(), null,
+					cEnumConstant.getLexicalValue(), null, null, null));
+		}
+
+		// model.enums().remove(altitudeModeGX.fullName());
+
+		// altitudeModeKML.javadoc
 		final Collection<CEnumConstant> constantsKML = altitudeModeKML.getConstants();
 		for (final CEnumConstant cEnumConstant : constantsKML) {
 			LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME + " altitudeMode property: " + cEnumConstant.getLexicalValue());
-    }
-		
-//		altitudeModeGX.parent.getOwnerPackage().remove(altitudeModeGX.);
-		
-		
+		}
+
+		// altitudeModeGX.parent.getOwnerPackage().remove(altitudeModeGX.);
+
 		final QName qNameCoordinate = new QName("http://www.opengis.net/kml/2.2", "Coordinate");
 		final QName qNameLongitude = new QName("PerlPleaseRemoveMeLongitude");
 		final QName qNameLatitude = new QName("PerlPleaseRemoveMeLatitude");
 		final QName qNameAltitude = new QName("PerlPleaseRemoveMeAltitude");
-		final CClassInfo cc4 = new CClassInfo(model, cClassInfoParentLink, "Coordinate", null, qNameCoordinate, null, schema, new CCustomizations());
+		final CClassInfo cc4 = new CClassInfo(model, cClassInfoParentLink, "Coordinate", null, qNameCoordinate, null,
+				schema, new CCustomizations());
 
-		//LOG.info(":::::::::::::::::::::::::::::::::: " + doubleValue.getType().fullName());
+		// LOG.info(":::::::::::::::::::::::::::::::::: " +
+		// doubleValue.getType().fullName());
 
-		final CAttributePropertyInfo cAttributeLongitude = new CAttributePropertyInfo("longitude", null, new CCustomizations(), null, qNameLongitude,
-		    doubleValue, null, false);
-		final CAttributePropertyInfo cAttributeLatitude = new CAttributePropertyInfo("latitude", null, null, null, qNameLatitude, doubleValue, null,
-		    false);
-		final CAttributePropertyInfo cAttributeAltitude = new CAttributePropertyInfo("altitude", null, new CCustomizations(), null, qNameAltitude,
-		    doubleValue, null, false);
+		final CAttributePropertyInfo cAttributeLongitude = new CAttributePropertyInfo("longitude", null,
+				new CCustomizations(), null, qNameLongitude, doubleValue, null, false);
+		final CAttributePropertyInfo cAttributeLatitude = new CAttributePropertyInfo("latitude", null, null, null,
+				qNameLatitude, doubleValue, null, false);
+		final CAttributePropertyInfo cAttributeAltitude = new CAttributePropertyInfo("altitude", null,
+				new CCustomizations(), null, qNameAltitude, doubleValue, null, false);
 
 		cc4.addProperty(cAttributeLongitude);
 		cc4.addProperty(cAttributeLatitude);
 		cc4.addProperty(cAttributeAltitude);
 	}
-
-
 
 	/**
 	 * Returns the option string used to turn on this plugin.
@@ -218,28 +220,35 @@ public class XJCJavaForKmlApiPlugin extends Plugin {
 	}
 
 	/**
-	 * On plugin activation, sets a customized NameConverter to adjust code generation.
+	 * On plugin activation, sets a customized NameConverter to adjust code
+	 * generation.
 	 * 
-	 * @param opts options used to invoke XJC
-	 * @throws com.sun.tools.xjc.BadCommandLineException if the plugin is invoked with wrong parameters
+	 * @param opts
+	 *            options used to invoke XJC
+	 * @throws com.sun.tools.xjc.BadCommandLineException
+	 *             if the plugin is invoked with wrong parameters
 	 */
 	@Override
 	public void onActivated(final Options opts) throws BadCommandLineException {
 
 		PropertyConfigurator.configure(LOG4J_LOCATION);
-		LOG
-		    .info(XJCJavaForKmlApiPlugin.PLUGINNAME + " clean up generated names (Legend: T = removed Type, A = removed Abstract, E = removed Enum");
+		LOG.info(XJCJavaForKmlApiPlugin.PLUGINNAME
+				+ " clean up generated names (Legend: T = removed Type, A = removed Abstract, E = removed Enum");
 		opts.setNameConverter(new OmitTypeNameConverter(), this);
 	}
 
 	/**
-	 * Returns true without touching the generated code. All the relevant work is done during name conversion.
+	 * Returns true without touching the generated code. All the relevant work is
+	 * done during name conversion.
 	 * 
-	 * @param model This object allows access to various generated code.
-	 * @param opts options used to invoke XJC
-	 * @param errorHandler Errors should be reported to this handler.
-	 * @return If the add-on executes successfully, return true. If it detects some errors but those are reported and recovered gracefully,
-	 *         return false.
+	 * @param model
+	 *            This object allows access to various generated code.
+	 * @param opts
+	 *            options used to invoke XJC
+	 * @param errorHandler
+	 *            Errors should be reported to this handler.
+	 * @return If the add-on executes successfully, return true. If it detects some
+	 *         errors but those are reported and recovered gracefully, return false.
 	 */
 	@Override
 	public boolean run(final Outline outline, final Options opts, final ErrorHandler errorHandler) {
